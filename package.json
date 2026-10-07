@@ -37,7 +37,8 @@
     "react-native": ">=0.72.0"
   },
   "dependencies": {
-    "class-variance-authority": "^0.7.1"
+    "class-variance-authority": "^0.7.1",
+    "react-native-svg": "^15.15.5"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^10.6.1",

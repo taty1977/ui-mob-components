@@ -1,4 +1,5 @@
-import { Pressable, Text, type PressableProps } from 'react-native';
+import { Pressable, Text, View, type PressableProps } from 'react-native';
+import type { ReactNode } from 'react';
 
 export type ButtonTone = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
 export type ButtonVariant = 'default' | 'label' | 'outline' | 'text';
@@ -16,11 +17,19 @@ const textSizeClasses: Record<ButtonSize, string> = {
   lg: 'text-18',
 };
 
+const iconGapClasses: Record<ButtonSize, string> = {
+  sm: 'gap-1.5',
+  md: 'gap-2',
+  lg: 'gap-2.5',
+};
+
 export type ButtonProps = Omit<PressableProps, 'children'> & {
   label: string;
   variant?: ButtonVariant;
   tone?: ButtonTone;
   size?: ButtonSize;
+  iconLeft?: ReactNode;
+  iconRight?: ReactNode;
   className?: string;
 };
 
@@ -29,6 +38,8 @@ export function Button({
   variant = 'default',
   tone = 'primary',
   size = 'md',
+  iconLeft,
+  iconRight,
   className,
   disabled,
   ...props
@@ -122,6 +133,21 @@ export function Button({
     text: toneStyle.text,
   };
 
+  const textClassName = ['font-semibold', textClasses[variant], textSizeClasses[size]].join(' ');
+
+  // The icon row carries the text color class so icons using currentColor
+  // (tone="inherit") match the label, including on native where inheritance
+  // requires a styled ancestor.
+  const content = iconLeft || iconRight ? (
+    <View className={['flex-row items-center', textClasses[variant], iconGapClasses[size]].join(' ')}>
+      {iconLeft}
+      <Text className={textClassName}>{label}</Text>
+      {iconRight}
+    </View>
+  ) : (
+    <Text className={textClassName}>{label}</Text>
+  );
+
   const classes = [
     'items-center justify-center rounded-md',
     variantClasses[variant],
@@ -139,13 +165,7 @@ export function Button({
       disabled={disabled}
       {...props}
     >
-      <Text className={[
-        'font-semibold',
-        textClasses[variant],
-        textSizeClasses[size],
-      ].join(' ')}>
-        {label}
-      </Text>
+      {content}
     </Pressable>
   );
 }
