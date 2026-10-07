@@ -26,7 +26,7 @@ describe('Icon', () => {
   });
 
   it('applies a tone class unless tone is inherit', () => {
-    expect(Icon({ name: 'plus', tone: 'primary' }).props.className).toContain('text-light-palette-primary-main');
+    expect(Icon({ name: 'plus', tone: 'primary' }).props.className).toContain('text-palette-primary-main');
     expect(Icon({ name: 'plus', tone: 'inherit' }).props.className).toBeUndefined();
   });
 
@@ -36,7 +36,7 @@ describe('Icon', () => {
 
   it('maps every palette tone to its token class', () => {
     for (const tone of ['primary', 'secondary', 'error', 'warning', 'info', 'success'] as const) {
-      expect(Icon({ name: 'plus', tone }).props.className).toContain(`text-light-palette-${tone}-main`);
+      expect(Icon({ name: 'plus', tone }).props.className).toContain(`text-palette-${tone}-main`);
     }
   });
 
@@ -44,5 +44,14 @@ describe('Icon', () => {
     const element = Icon({ name: 'close', accessibilityLabel: 'Close dialog' });
     expect(element.props.accessibilityRole).toBe('image');
     expect(element.props.accessibilityLabel).toBe('Close dialog');
+    expect(element.props.accessible).toBe(true);
+  });
+
+  it('is hidden from assistive technology when no label makes it decorative', () => {
+    const element = Icon({ name: 'plus' });
+    expect(element.props.accessibilityRole).toBe('none');
+    expect(element.props.accessible).toBe(false);
+    expect(element.props.accessibilityElementsHidden).toBe(true);
+    expect(element.props.importantForAccessibility).toBe('no-hide-descendants');
   });
 });

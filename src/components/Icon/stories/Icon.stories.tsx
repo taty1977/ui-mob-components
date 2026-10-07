@@ -19,6 +19,11 @@ const meta = {
       options: names,
       table: { category: 'Content' },
     },
+    children: {
+      control: false,
+      description: 'Custom SVG content (reserved — not rendered by the component today)',
+      table: { category: 'Content' },
+    },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
@@ -48,11 +53,11 @@ type Story = StoryObj<typeof meta>;
 export const Playground: Story = {};
 
 export const Gallery: Story = {
-  render: () => (
+  render: (args) => (
     <View className="flex-row flex-wrap gap-4">
       {names.map((name) => (
         <View key={name} className="items-center gap-1">
-          <Icon name={name} tone="primary" />
+          <Icon name={name} size={args.size} tone={args.tone} />
           <Text className="text-13 text-light-text-secondary">{name}</Text>
         </View>
       ))}
@@ -60,14 +65,17 @@ export const Gallery: Story = {
   ),
 };
 
-export const InButtons: Story = {
-  render: () => (
+const tones = ['inherit', 'primary', 'secondary', 'error', 'warning', 'info', 'success', 'muted', 'inverse'] as const;
+
+export const Tones: Story = {
+  render: (args) => (
     <View className="gap-3">
-      <View className="flex-row items-center gap-2">
-        <Icon name="chevron-left" size="sm" tone="muted" />
-        <Text className="text-15 text-light-text-primary">Icons scale alongside text</Text>
-        <Icon name="chevron-right" size="sm" tone="muted" />
-      </View>
+      {tones.map((tone) => (
+        <View key={tone} className="flex-row items-center gap-2">
+          <Icon name={args.name} size={args.size} tone={tone} />
+          <Text className="text-13 capitalize text-light-text-secondary">{tone}</Text>
+        </View>
+      ))}
     </View>
   ),
 };

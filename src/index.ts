@@ -1,9 +1,17 @@
-export { Button } from './components';
+export { Button, Icon, iconPaths, Input } from './components';
 export type {
 	ButtonProps,
 	ButtonSize,
 	ButtonTone,
 	ButtonVariant,
+	IconName,
+	IconProps,
+	IconSize,
+	IconTone,
+	InputProps,
+	InputSize,
+	InputTone,
+	InputVariant,
 } from './components';
 export {
 	darkTheme,

@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 const figmaTokens = require('./tokens/figma/tokens.json');
 const {
+  adaptiveColors,
   dimensions,
   scaleUtilities,
   themeColors,
@@ -30,6 +31,9 @@ module.exports = {
       colors: {
         light: themeColors(figmaTokens, 'Light'),
         dark: themeColors(figmaTokens, 'Dark'),
+        // Theme-adaptive classes (no light/dark prefix) resolve via CSS
+        // variables that flip with the .light/.dark theme class.
+        ...adaptiveColors(figmaTokens),
       },
       spacing: dimensions(figmaTokens, 'Gap', 'spacing'),
       borderRadius: dimensions(figmaTokens, 'Border-Radius', 'radius'),

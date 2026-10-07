@@ -77,6 +77,36 @@ const themeColors = (figmaTokens, mode) => {
   };
 };
 
+// CSS variables for every semantic color, per theme mode: --text-primary,
+// --palette-primary-main, --action-hover, ... (flattened themeColors tree).
+const colorVariablesForMode = (figmaTokens, mode) => {
+  const flatten = (obj, path, out) => {
+    for (const [key, value] of Object.entries(obj)) {
+      const next = [...path, key];
+      if (typeof value === 'string') out[`--${next.join('-')}`] = value;
+      else flatten(value, next, out);
+    }
+    return out;
+  };
+  return flatten(themeColors(figmaTokens, mode), [], {});
+};
+
+// Same tree shape as themeColors, but values are var(--...) references, so the
+// generated utilities follow the active theme (the .light/.dark class flips
+// the variables). Produces classes like text-palette-primary-main.
+const adaptiveColors = (figmaTokens) => {
+  const build = (obj, path) =>
+    Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [
+        key,
+        typeof value === 'string'
+          ? `var(--${[...path, key].join('-')})`
+          : build(value, [...path, key]),
+      ]),
+    );
+  return build(themeColors(figmaTokens, 'Light'), []);
+};
+
 const dimensionScale = (tokens) =>
   Object.fromEntries(
     Object.entries(tokenValues(tokens)).map(([name, value]) => [
@@ -136,6 +166,7 @@ const typographyVariablesForMode = (figmaTokens, mode) => {
 const variablesForMode = (figmaTokens, mode) => ({
   ...typographyVariablesForMode(figmaTokens, mode),
   ...dimensionVariablesForMode(figmaTokens, mode),
+  ...colorVariablesForMode(figmaTokens, mode),
 });
 
 const scaleUtilities = (figmaTokens, scaleName) => {
@@ -153,6 +184,7 @@ const scaleUtilities = (figmaTokens, scaleName) => {
 };
 
 module.exports = {
+  adaptiveColors,
   colorScale,
   dimensions,
   scaleUtilities,

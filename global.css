@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Browser autofill paints a pale background over saved-data inputs and forces
+   a text fill color. Animate the UA background change over ~a week so it never
+   becomes visible, and keep the themed text color via currentColor. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+input:autofill {
+  transition: background-color 600000s ease-in-out 0s;
+  -webkit-text-fill-color: currentColor;
+}

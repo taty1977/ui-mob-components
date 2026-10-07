@@ -52,6 +52,12 @@ src/
       stories/
       tests/
       README.md             # Figma icon import workflow
+    Input/
+      Input.tsx             # InputView (stateless) + Input (stateful wrapper)
+      input.styles.ts       # style tables (frames, tones, paddings)
+      LabelText.tsx         # shared label with required asterisk
+      stories/
+      tests/
   themes/                   # Figma token -> theme mapping (light/dark)
 tokens/figma/tokens.json    # exported Figma variables
 ```
@@ -59,7 +65,7 @@ tokens/figma/tokens.json    # exported Figma variables
 ## Usage
 
 ```tsx
-import { Button, Icon } from 'ui-mob-components';
+import { Button, Icon, Input } from 'ui-mob-components';
 
 <Button label="Save" tone="primary" variant="default" />
 <Button
@@ -68,6 +74,8 @@ import { Button, Icon } from 'ui-mob-components';
   tone="secondary"
   iconRight={<Icon name="chevron-right" />}
 />
+<Input label="Email" helperText="We never share it" />
+<Input label="Search" iconLeft={<Icon name="chevron-left" />} tone="secondary" />
 ```
 
 ### Button
@@ -90,6 +98,22 @@ the underlying `Pressable`, so press handling works with no extra wiring:
 <Button label="Save" onPress={() => save()} onLongPress={() => preview()} />
 ```
 
+### Input
+
+MUI-style text field (label, helper text, error state, adornments) built on
+`TextInput`; all `TextInput` props pass through.
+
+| Prop | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `label` | `string` | — | Floats MUI-style once the field has a value; doubles as `accessibilityLabel` |
+| `helperText` | `string` | — | Hint below the field; error-toned when `error` is set |
+| `variant` | `'outlined' \| 'filled' \| 'standard'` | `'outlined'` | Box / gray fill + underline / underline only |
+| `size` | `'small' \| 'normal'` | `'normal'` | 44px / 48px field height |
+| `tone` | `'primary' \| 'secondary' \| 'error' \| 'warning' \| 'info' \| 'success'` | `'primary'` | Border and focused-label color |
+| `error` / `disabled` / `required` | `boolean` | `false` | MUI states; `error` always overrides `tone` |
+| `iconLeft` / `iconRight` | `ReactNode` | — | Adornments; the icon side gets 50% less padding |
+| `className` / `inputClassName` | `string` | — | Extra NativeWind classes on the wrapper / the `TextInput` |
+
 ### Icon
 
 | Prop | Type | Default | Notes |
@@ -107,7 +131,9 @@ Adding icons from Figma is documented in [src/components/Icon/README.md](src/com
 Themes are built from `tokens/figma/tokens.json` (Light and Dark Figma variables).
 `src/themes/themeTokens.ts` resolves token references into `lightTheme` / `darkTheme`
 objects, and `tailwind.config.js` exposes the same values as NativeWind classes such
-as `bg-light-palette-primary-main`. In Storybook, the Theme toolbar toggles the
+as `bg-light-palette-primary-main`. Classes without the `light`/`dark` prefix
+(e.g. `text-palette-primary-main`) resolve through per-theme CSS variables and
+follow the active theme — Icon tones use these. In Storybook, the Theme toolbar toggles the
 preview between the light and dark token sets.
 
 ## Consumer setup
@@ -126,3 +152,20 @@ content: [
 Configure NativeWind's Babel and Metro integrations in the consuming app as
 described in the NativeWind installation guide. `nativewind` is a peer dependency,
 so the app controls the NativeWind runtime version.
+
+### Web: browser autofill tint
+
+On the web, browsers paint a pale background over autofilled inputs and force a
+text fill color. This repo's `global.css` already neutralizes it; add the same
+snippet to your app's global stylesheet:
+
+```css
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+input:autofill {
+  transition: background-color 600000s ease-in-out 0s;
+  -webkit-text-fill-color: currentColor;
+}
+```

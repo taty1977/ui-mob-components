@@ -20,15 +20,16 @@ const sizeValues: Record<IconSize, number> = {
   lg: 24,
 };
 
+// Theme-adaptive classes: resolve through per-theme CSS variables.
 const toneClasses: Record<Exclude<IconTone, 'inherit'>, string> = {
-  primary: 'text-light-palette-primary-main',
-  secondary: 'text-light-palette-secondary-main',
-  error: 'text-light-palette-error-main',
-  warning: 'text-light-palette-warning-main',
-  info: 'text-light-palette-info-main',
-  success: 'text-light-palette-success-main',
-  muted: 'text-light-text-secondary',
-  inverse: 'text-light-misc-bg-white',
+  primary: 'text-palette-primary-main',
+  secondary: 'text-palette-secondary-main',
+  error: 'text-palette-error-main',
+  warning: 'text-palette-warning-main',
+  info: 'text-palette-info-main',
+  success: 'text-palette-success-main',
+  muted: 'text-text-secondary',
+  inverse: 'text-misc-bg-white',
 };
 
 export type IconProps = {
@@ -50,6 +51,9 @@ export function Icon({
   const dimension = sizeValues[size];
   const colorClass = tone === 'inherit' ? undefined : toneClasses[tone];
   const classes = [colorClass, className].filter(Boolean).join(' ');
+  // Without a label the icon is decorative: hide it from assistive technology
+  // (also avoids the svg-img-alt violation an unnamed role=img would trigger).
+  const decorative = !accessibilityLabel;
 
   return (
     <Svg
@@ -58,8 +62,11 @@ export function Icon({
       viewBox="0 0 24 24"
       fill="currentColor"
       className={classes || undefined}
+      accessible={!decorative}
+      accessibilityElementsHidden={decorative}
+      importantForAccessibility={decorative ? 'no-hide-descendants' : 'auto'}
       accessibilityLabel={accessibilityLabel}
-      accessibilityRole="image"
+      accessibilityRole={decorative ? 'none' : 'image'}
     >
       <Path d={iconPaths[name]} />
     </Svg>

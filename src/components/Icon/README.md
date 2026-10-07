@@ -30,6 +30,7 @@ tokens only — no icon geometry. To add a real icon from Figma:
 - Keep fills as `currentColor` by only pasting path data — the `Icon` component
   sets `fill="currentColor"` so the `tone` prop / text color controls the paint.
 - Names are kebab-case, matching the Figma layer name (e.g. `chevron-left`).
+- Entries in `iconPaths` are sorted alphabetically by name.
 
 ## Usage
 
@@ -47,6 +48,5 @@ import { Icon } from 'ui-mob-components';
 | `className` | `string` | — | Extra NativeWind classes, merged last |
 | `accessibilityLabel` | `string` | — | Announced name; omit for decorative icons |
 
-The starter paths (`plus`, `close`, `chevron-left`, `chevron-right`, `check`)
-are placeholders on a Material-style 24px grid — replace them with your Figma
-exports.
+The bundled paths are placeholders on a Material-style 24px grid — replace
+them with your Figma exports.
