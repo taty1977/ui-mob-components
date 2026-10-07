@@ -1,1 +1,4 @@
-npm run build
+npx lint-staged
+npm run typecheck
+npm test
+

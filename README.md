@@ -20,7 +20,19 @@ npm run storybook
 | `npm test` | Run the Vitest unit tests once |
 | `npm run test:watch` | Run Vitest in watch mode |
 | `npm run typecheck` | Type-check `src` without emitting |
+| `npm run lint` | ESLint (TypeScript + React rules) |
 | `npm run build` | Build `lib/` (CJS, ESM, types) and copy tokens |
+
+### Commit hooks
+
+Husky gates every commit with:
+
+1. `lint-staged` — ESLint `--fix` on staged files only
+2. `npm run typecheck` — full `tsc --noEmit`
+3. `npm test` — the Vitest suite
+
+The commit aborts if any step fails. To check beforehand, run `npm run lint`,
+`npm run typecheck`, or `npm test` manually.
 
 ## Project structure
 
@@ -69,6 +81,14 @@ import { Button, Icon } from 'ui-mob-components';
 | `iconLeft` / `iconRight` | `ReactNode` | — | Consumer-supplied nodes rendered beside the label; they inherit the label color |
 | `className` | `string` | — | Extra NativeWind classes, merged last |
 | `disabled` | `boolean` | `false` | Renders at 45% opacity |
+
+All other React Native [`Pressable`](https://reactnative.dev/docs/pressable) props
+— `onPress`, `onLongPress`, `accessibilityLabel`, `testID`, etc. — are forwarded to
+the underlying `Pressable`, so press handling works with no extra wiring:
+
+```tsx
+<Button label="Save" onPress={() => save()} onLongPress={() => preview()} />
+```
 
 ### Icon
 
