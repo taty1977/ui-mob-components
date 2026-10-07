@@ -13,6 +13,32 @@ const colorScale = (tokens, prefix) =>
     ]),
   );
 
+const resolveTokenReference = (figmaTokens, value) => {
+  const reference = value.match(/^\{(.+)\}$/);
+  if (!reference) return value;
+
+  const target = reference[1].split('.').reduce((current, key) => {
+    if (!current || typeof current !== 'object' || !(key in current)) {
+      throw new Error(`Unknown Figma token reference: ${value}`);
+    }
+    return current[key];
+  }, figmaTokens);
+
+  if (!target || typeof target !== 'object' || typeof target.$value !== 'string') {
+    throw new Error(`Invalid Figma token reference: ${value}`);
+  }
+
+  return resolveTokenReference(figmaTokens, target.$value);
+};
+
+const colorPalette = (figmaTokens, tokens) =>
+  Object.fromEntries(
+    Object.entries(tokenValues(tokens)).map(([name, value]) => [
+      name,
+      resolveTokenReference(figmaTokens, value),
+    ]),
+  );
+
 const themeColors = (figmaTokens, mode) => {
   const variables = figmaTokens.Variables[mode];
   const primitives = figmaTokens.Primitives[mode];
@@ -21,6 +47,9 @@ const themeColors = (figmaTokens, mode) => {
     background: {
       canvas: variables.Misc['body-bg'].$value,
       surface: variables.Misc.paper.$value,
+    },
+    misc: {
+      'bg-white': variables.Misc['bg-white'].$value,
     },
     text: {
       primary: variables.Theme['text-primary'].$value,
@@ -31,18 +60,14 @@ const themeColors = (figmaTokens, mode) => {
       subtle: variables.Theme['outline-border'].$value,
       input: variables.Theme['input-border'].$value,
     },
-    brand: {
-      primary: primitives.Color.Primary['primary-500'].$value,
-      50: '#f5f3ff',
-      ...colorScale(primitives.Color.Primary, 'primary'),
-    },
-    neutral: {
-      50: variables.Misc['grey-light'].$value,
-      ...colorScale(primitives.Color.Gray, 'gray'),
-    },
+    primary: colorScale(primitives.Color.Primary, 'primary'),
+    secondary: colorScale(primitives.Color.Secondary, 'secondary'),
+    info: colorScale(primitives.Color.Info, 'info'),
+    gray: colorScale(primitives.Color.Gray, 'gray'),
     error: colorScale(primitives.Color.Error, 'error'),
     success: colorScale(primitives.Color.Success, 'success'),
     warning: colorScale(primitives.Color.Warning, 'warning'),
+    palette: colorPalette(figmaTokens, variables['Color-Palette']),
     action: {
       active: variables.Theme['action-active'].$value,
       hover: variables.Theme['action-hover'].$value,

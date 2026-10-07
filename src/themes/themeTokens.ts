@@ -4,12 +4,48 @@ export type FigmaThemeMode = keyof typeof figmaTokens.Variables;
 
 const pixels = (value: string) => Number.parseFloat(value);
 
+const resolveTokenValue = (value: string): string => {
+    const reference = value.match(/^\{(.+)\}$/);
+    if (!reference) return value;
+
+    const token = reference[1].split('.').reduce<unknown>((current, key) => {
+        if (typeof current !== 'object' || current === null || !(key in current)) {
+            throw new Error(`Unknown Figma token reference: ${value}`);
+        }
+        return (current as Record<string, unknown>)[key];
+    }, figmaTokens);
+
+    if (typeof token !== 'object' || token === null || !('$value' in token)) {
+        throw new Error(`Invalid Figma token reference: ${value}`);
+    }
+
+    return resolveTokenValue((token as { $value: string }).$value);
+};
+
+const mapColorPalette = (
+    palette: (typeof figmaTokens.Variables)[FigmaThemeMode]['Color-Palette'],
+) =>
+    Object.fromEntries(
+        Object.entries(palette)
+            .flatMap(([name, token]) => {
+                if (
+                    name === '$type' ||
+                    typeof token !== 'object' ||
+                    !('$value' in token) ||
+                    typeof token.$value !== 'string'
+                ) {
+                    return [];
+                }
+                return [[name, resolveTokenValue(token.$value)]];
+            }),
+    );
+
 const mapCoreTokens = (
     variables: (typeof figmaTokens.Variables)[FigmaThemeMode],
     primitives: (typeof figmaTokens.Primitives)[FigmaThemeMode],
 ) => ({
     color: {
-        brand: {
+        primary: {
             100: primitives.Color.Primary['primary-100'].$value,
             200: primitives.Color.Primary['primary-200'].$value,
             300: primitives.Color.Primary['primary-300'].$value,
@@ -17,9 +53,32 @@ const mapCoreTokens = (
             500: primitives.Color.Primary['primary-500'].$value,
             600: primitives.Color.Primary['primary-600'].$value,
             700: primitives.Color.Primary['primary-700'].$value,
+            800: primitives.Color.Primary['primary-800'].$value,
+            900: primitives.Color.Primary['primary-900'].$value,
         },
-        neutral: {
-            50: variables.Misc['grey-light'].$value,
+        secondary: {
+            100: primitives.Color.Secondary['secondary-100'].$value,
+            200: primitives.Color.Secondary['secondary-200'].$value,
+            300: primitives.Color.Secondary['secondary-300'].$value,
+            400: primitives.Color.Secondary['secondary-400'].$value,
+            500: primitives.Color.Secondary['secondary-500'].$value,
+            600: primitives.Color.Secondary['secondary-600'].$value,
+            700: primitives.Color.Secondary['secondary-700'].$value,
+            800: primitives.Color.Secondary['secondary-800'].$value,
+            900: primitives.Color.Secondary['secondary-900'].$value,
+        },
+        info: {
+            100: primitives.Color.Info['info-100'].$value,
+            200: primitives.Color.Info['info-200'].$value,
+            300: primitives.Color.Info['info-300'].$value,
+            400: primitives.Color.Info['info-400'].$value,
+            500: primitives.Color.Info['info-500'].$value,
+            600: primitives.Color.Info['info-600'].$value,
+            700: primitives.Color.Info['info-700'].$value,
+            800: primitives.Color.Info['info-800'].$value,
+            900: primitives.Color.Info['info-900'].$value,
+        },
+        gray: {
             100: primitives.Color.Gray['gray-100'].$value,
             200: primitives.Color.Gray['gray-200'].$value,
             300: primitives.Color.Gray['gray-300'].$value,
@@ -33,21 +92,37 @@ const mapCoreTokens = (
         error: {
             100: primitives.Color.Error['error-100'].$value,
             200: primitives.Color.Error['error-200'].$value,
+            300: primitives.Color.Error['error-300'].$value,
+            400: primitives.Color.Error['error-400'].$value,
             500: primitives.Color.Error['error-500'].$value,
             600: primitives.Color.Error['error-600'].$value,
+            700: primitives.Color.Error['error-700'].$value,
+            800: primitives.Color.Error['error-800'].$value,
+            900: primitives.Color.Error['error-900'].$value,
         },
         success: {
             100: primitives.Color.Success['success-100'].$value,
             200: primitives.Color.Success['success-200'].$value,
+            300: primitives.Color.Success['success-300'].$value,
+            400: primitives.Color.Success['success-400'].$value,
             500: primitives.Color.Success['success-500'].$value,
             600: primitives.Color.Success['success-600'].$value,
+            700: primitives.Color.Success['success-700'].$value,
+            800: primitives.Color.Success['success-800'].$value,
+            900: primitives.Color.Success['success-900'].$value,
         },
         warning: {
             100: primitives.Color.Warning['warning-100'].$value,
             200: primitives.Color.Warning['warning-200'].$value,
+            300: primitives.Color.Warning['warning-300'].$value,
+            400: primitives.Color.Warning['warning-400'].$value,
             500: primitives.Color.Warning['warning-500'].$value,
             600: primitives.Color.Warning['warning-600'].$value,
+            700: primitives.Color.Warning['warning-700'].$value,
+            800: primitives.Color.Warning['warning-800'].$value,
+            900: primitives.Color.Warning['warning-900'].$value,
         },
+        palette: mapColorPalette(variables['Color-Palette']),
     },
     space: {
         1: pixels(primitives.Gap['gap-1'].$value),
@@ -119,8 +194,8 @@ export function mapTokensToTheme(
         border: {
             subtle: variables.Theme['outline-border'].$value,
         },
-        brand: {
-            primary: primitives.Color.Primary['primary-500'].$value,
+        primary: {
+            main: primitives.Color.Primary['primary-500'].$value,
         },
     } as const;
 
@@ -131,7 +206,7 @@ export function mapTokensToTheme(
                 background: {
                     canvas: color.background.canvas,
                     surface: color.background.surface,
-                    primary: color.brand.primary,
+                    primary: color.primary.main,
                     success: primitives.Color.Success['success-500'].$value,
                     warning: primitives.Color.Warning['warning-500'].$value,
                     error: primitives.Color.Error['error-500'].$value,
