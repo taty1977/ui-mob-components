@@ -1,6 +1,8 @@
 import { useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { Animated, Easing, LayoutAnimation, Platform, Pressable, Text, View, type PressableProps } from 'react-native';
 
+import { Icon } from '../Icon';
+
 // --- Types -----------------------------------------------------------------------
 
 export type StepperTone = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
@@ -22,7 +24,7 @@ export type StepperProps = {
   onStepPress?: (index: number) => void;
   /** Accent color for active and completed steps. */
   tone?: StepperTone;
-  /** Custom node shown on completed steps (e.g., your icon set); defaults to a check text. */
+  /** Custom node shown on completed steps (e.g., your icon set); defaults to a check icon. */
   completedIcon?: ReactNode;
   className?: string;
 };
@@ -33,7 +35,6 @@ export type StepperViewProps = StepperProps & {
 };
 
 // --- Tone styles ------------------------------------------------------------------
-// Active/completed steps carry the tone; inactive steps stay neutral.
 const toneClasses: Record<StepperTone, { bg: string; text: string }> = {
   primary: { bg: 'bg-palette-primary-main', text: 'text-palette-primary-main' },
   secondary: { bg: 'bg-palette-secondary-main', text: 'text-palette-secondary-main' },
@@ -45,7 +46,6 @@ const toneClasses: Record<StepperTone, { bg: string; text: string }> = {
 
 const INACTIVE_BG = 'bg-action-disabled';
 
-// Shared style for the default number / check glyphs.
 const CIRCLE_TEXT_CLASS = 'text-13 font-semibold text-misc-bg-white';
 
 // --- Step circle -------------------------------------------------------------------
@@ -71,7 +71,7 @@ function StepCircle({
   children,
   ...a11y
 }: StepCircleProps): ReactElement {
-  // Idle at 1: the interpolation ends at opacity 0, so the halo is invisible at rest.
+  // Idle at 1 so the halo is invisible at rest.
   const pulse = useRef(new Animated.Value(1)).current;
 
   const firePulse = () => {
@@ -97,7 +97,15 @@ function StepCircle({
             transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.9] }) }],
           }}
         />
-        <View className={className}>{children}</View>
+        {/* Decorative — the Pressable label names the step. */}
+        <View
+          className={className}
+          aria-hidden={true}
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
+        >
+          {children}
+        </View>
       </View>
     </Pressable>
   );
@@ -132,7 +140,7 @@ export function StepperView({
             : 'text-text-secondary';
         // Content priority: completed icon > step icon > step number.
         const circleContent = isCompleted
-          ? (completedIcon ?? <Text className={CIRCLE_TEXT_CLASS}>✓</Text>)
+          ? (completedIcon ?? <Icon name="check" size="sm" tone="inverse" />) // SVG: no visible text to mismatch the label
           : (step.icon ?? <Text className={CIRCLE_TEXT_CLASS}>{index + 1}</Text>);
 
         return (
@@ -176,9 +184,7 @@ export function StepperView({
 
 // --- Component ---------------------------------------------------------------------
 
-/** Vertical stepper with collapsible step content. Controlled via activeStep
- * or uncontrolled with internal state; LayoutAnimation animates the content
- * on native (no-op on web). */
+/** Vertical stepper; controlled via activeStep or uncontrolled (LayoutAnimation on native only). */
 export function Stepper({
   steps,
   activeStep,
@@ -193,7 +199,7 @@ export function Stepper({
     if (Platform.OS !== 'web') {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }
-    // No state update when controlled — the parent drives activeStep.
+    // Skip state when controlled.
     if (activeStep === undefined) setInternalStep(index);
     onStepPress?.(index);
   };

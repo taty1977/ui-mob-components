@@ -1,6 +1,13 @@
 import type { ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+// Stub react-native-svg (only reached via Icon; its source isn't Node-parseable).
+vi.mock('react-native-svg', () => {
+  const Svg = (props: Record<string, unknown>) => ({ type: 'Svg', props });
+  const Path = (props: Record<string, unknown>) => ({ type: 'Path', props });
+  return { default: Svg, Path };
+});
+
 import { StepperView } from '../Stepper';
 import type { StepperStep, StepperViewProps } from '../Stepper';
 
@@ -31,11 +38,11 @@ const titleTextOf = (row: AnyElement) =>
 describe('Stepper', () => {
   // --- Circle content ---------------------------------------------------------------
 
-  it('marks steps before the active index as completed with a check text', () => {
+  it('marks steps before the active index as completed with a check icon', () => {
     const rows = rowsOf(renderStepper());
     const circle = circleOf(rows[0]);
     expect(circle.props.className).toContain('bg-palette-primary-main');
-    expect((circle.props.children as AnyElement).props.children).toBe('✓');
+    expect((circle.props.children as AnyElement).props.name).toBe('check');
   });
 
   it('renders a custom completed icon when provided', () => {

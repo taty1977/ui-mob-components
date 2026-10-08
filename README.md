@@ -68,6 +68,11 @@ src/
       index.ts
       stories/
       tests/
+    Stepper/
+      Stepper.tsx           # StepperView (stateless) + Stepper (stateful wrapper)
+      index.ts
+      stories/
+      tests/
   themes/                   # Figma token -> theme mapping (light/dark)
 tokens/figma/tokens.json    # exported Figma variables
 ```
@@ -85,7 +90,11 @@ import { Button, Icon, Input, Logo } from 'ui-mob-components';
   iconRight={<Icon name="chevron-right" />}
 />
 <Input label="Email" helperText="We never share it" />
-<Input label="Search" iconLeft={<Icon name="chevron-left" />} tone="secondary" /><Logo size={48} />```
+<Input label="Search" iconLeft={<Icon name="chevron-left" />} tone="secondary" />
+<Logo size={48} />
+<Splash message="Loading patient vitals…" />
+<Stepper steps={[{ title: 'Account' }, { title: 'Verify' }, { title: 'Done' }]} />
+```
 
 ### Button
 
