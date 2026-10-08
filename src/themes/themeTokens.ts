@@ -2,8 +2,11 @@ import figmaTokens from '../../tokens/figma/tokens.json';
 
 export type FigmaThemeMode = keyof typeof figmaTokens.Variables;
 
+// --- Helpers ------------------------------------------------------------------
+
 const pixels = (value: string) => Number.parseFloat(value);
 
+// Resolve "{A.B.C}" token references recursively to their final value.
 const resolveTokenValue = (value: string): string => {
     const reference = value.match(/^\{(.+)\}$/);
     if (!reference) return value;
@@ -22,6 +25,15 @@ const resolveTokenValue = (value: string): string => {
     return resolveTokenValue((token as { $value: string }).$value);
 };
 
+const SCALE_STEPS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
+
+// Build a 100–900 scale from a primitives color group (Color.Primary, ...).
+const colorScale = (colors: Record<string, { $value: string }>, prefix: string) =>
+    Object.fromEntries(
+        SCALE_STEPS.map((step) => [step, colors[`${prefix}-${step}`].$value]),
+    );
+
+// Resolve every Color-Palette token reference to its hex value.
 const mapColorPalette = (
     palette: (typeof figmaTokens.Variables)[FigmaThemeMode]['Color-Palette'],
 ) =>
@@ -40,88 +52,21 @@ const mapColorPalette = (
             }),
     );
 
+// --- Theme assembly -------------------------------------------------------------
+
+// Primitives -> core token scales (shared structure across modes).
 const mapCoreTokens = (
     variables: (typeof figmaTokens.Variables)[FigmaThemeMode],
     primitives: (typeof figmaTokens.Primitives)[FigmaThemeMode],
 ) => ({
     color: {
-        primary: {
-            100: primitives.Color.Primary['primary-100'].$value,
-            200: primitives.Color.Primary['primary-200'].$value,
-            300: primitives.Color.Primary['primary-300'].$value,
-            400: primitives.Color.Primary['primary-400'].$value,
-            500: primitives.Color.Primary['primary-500'].$value,
-            600: primitives.Color.Primary['primary-600'].$value,
-            700: primitives.Color.Primary['primary-700'].$value,
-            800: primitives.Color.Primary['primary-800'].$value,
-            900: primitives.Color.Primary['primary-900'].$value,
-        },
-        secondary: {
-            100: primitives.Color.Secondary['secondary-100'].$value,
-            200: primitives.Color.Secondary['secondary-200'].$value,
-            300: primitives.Color.Secondary['secondary-300'].$value,
-            400: primitives.Color.Secondary['secondary-400'].$value,
-            500: primitives.Color.Secondary['secondary-500'].$value,
-            600: primitives.Color.Secondary['secondary-600'].$value,
-            700: primitives.Color.Secondary['secondary-700'].$value,
-            800: primitives.Color.Secondary['secondary-800'].$value,
-            900: primitives.Color.Secondary['secondary-900'].$value,
-        },
-        info: {
-            100: primitives.Color.Info['info-100'].$value,
-            200: primitives.Color.Info['info-200'].$value,
-            300: primitives.Color.Info['info-300'].$value,
-            400: primitives.Color.Info['info-400'].$value,
-            500: primitives.Color.Info['info-500'].$value,
-            600: primitives.Color.Info['info-600'].$value,
-            700: primitives.Color.Info['info-700'].$value,
-            800: primitives.Color.Info['info-800'].$value,
-            900: primitives.Color.Info['info-900'].$value,
-        },
-        gray: {
-            100: primitives.Color.Gray['gray-100'].$value,
-            200: primitives.Color.Gray['gray-200'].$value,
-            300: primitives.Color.Gray['gray-300'].$value,
-            400: primitives.Color.Gray['gray-400'].$value,
-            500: primitives.Color.Gray['gray-500'].$value,
-            600: primitives.Color.Gray['gray-600'].$value,
-            700: primitives.Color.Gray['gray-700'].$value,
-            800: primitives.Color.Gray['gray-800'].$value,
-            900: primitives.Color.Gray['gray-900'].$value,
-        },
-        error: {
-            100: primitives.Color.Error['error-100'].$value,
-            200: primitives.Color.Error['error-200'].$value,
-            300: primitives.Color.Error['error-300'].$value,
-            400: primitives.Color.Error['error-400'].$value,
-            500: primitives.Color.Error['error-500'].$value,
-            600: primitives.Color.Error['error-600'].$value,
-            700: primitives.Color.Error['error-700'].$value,
-            800: primitives.Color.Error['error-800'].$value,
-            900: primitives.Color.Error['error-900'].$value,
-        },
-        success: {
-            100: primitives.Color.Success['success-100'].$value,
-            200: primitives.Color.Success['success-200'].$value,
-            300: primitives.Color.Success['success-300'].$value,
-            400: primitives.Color.Success['success-400'].$value,
-            500: primitives.Color.Success['success-500'].$value,
-            600: primitives.Color.Success['success-600'].$value,
-            700: primitives.Color.Success['success-700'].$value,
-            800: primitives.Color.Success['success-800'].$value,
-            900: primitives.Color.Success['success-900'].$value,
-        },
-        warning: {
-            100: primitives.Color.Warning['warning-100'].$value,
-            200: primitives.Color.Warning['warning-200'].$value,
-            300: primitives.Color.Warning['warning-300'].$value,
-            400: primitives.Color.Warning['warning-400'].$value,
-            500: primitives.Color.Warning['warning-500'].$value,
-            600: primitives.Color.Warning['warning-600'].$value,
-            700: primitives.Color.Warning['warning-700'].$value,
-            800: primitives.Color.Warning['warning-800'].$value,
-            900: primitives.Color.Warning['warning-900'].$value,
-        },
+        primary: colorScale(primitives.Color.Primary, 'primary'),
+        secondary: colorScale(primitives.Color.Secondary, 'secondary'),
+        info: colorScale(primitives.Color.Info, 'info'),
+        gray: colorScale(primitives.Color.Gray, 'gray'),
+        error: colorScale(primitives.Color.Error, 'error'),
+        success: colorScale(primitives.Color.Success, 'success'),
+        warning: colorScale(primitives.Color.Warning, 'warning'),
         palette: mapColorPalette(variables['Color-Palette']),
     },
     space: {
@@ -176,6 +121,7 @@ const mapCoreTokens = (
     },
 });
 
+// Variables -> semantic theme (background/text/border/action).
 export function mapTokensToTheme(
     obj: typeof figmaTokens,
     mode: FigmaThemeMode,
@@ -247,6 +193,7 @@ export function mapTokensToTheme(
     } as const;
 }
 
+// Full token set for one mode: core scales + semantic layer.
 const createThemeTokens = (mode: FigmaThemeMode) => {
     const variables = figmaTokens.Variables[mode];
     const primitives = figmaTokens.Primitives[mode];
@@ -259,12 +206,17 @@ const createThemeTokens = (mode: FigmaThemeMode) => {
     } as const;
 };
 
+// --- Public API -----------------------------------------------------------------
+
 const lightModeTokens = createThemeTokens('Light');
 const darkModeTokens = createThemeTokens('Dark');
 
+/** Semantic colors for the light theme. */
 export const lightTheme = { color: lightModeTokens.color } as const;
+/** Semantic colors for the dark theme. */
 export const darkTheme = { color: darkModeTokens.color } as const;
 
+/** All resolved tokens; `core`/`semantic` default to light. */
 export const themeTokens = {
     core: lightModeTokens.core,
     semantic: lightModeTokens.semantic,

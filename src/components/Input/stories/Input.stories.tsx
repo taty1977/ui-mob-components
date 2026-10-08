@@ -1,9 +1,19 @@
+import type { ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
 import { View } from 'react-native';
 import { Input, InputView } from '../Input';
 import { Icon } from '../../Icon';
 
 const tones = ['primary', 'secondary', 'error', 'warning', 'info', 'success'] as const;
+
+// Fixed-width frame so fields don't stretch across the canvas.
+const Frame = ({ children }: { children: ReactNode }) => (
+  <View className="gap-6 max-w-80">{children}</View>
+);
+
+// Icon node for the iconLeft/iconRight boolean demo controls.
+const demoIcon = (name: 'chevron-left' | 'chevron-right', show: unknown) =>
+  show ? <Icon name={name} /> : undefined;
 
 const meta = {
   title: 'Components/Input',
@@ -89,67 +99,39 @@ const meta = {
       description: 'Extra NativeWind classes on the TextInput itself',
       table: { category: 'Advanced' },
     },
-    ref: {
-      control: false,
-      description: 'Ref to the underlying TextInput (focus, blur, clear programmatically)',
-      table: { category: 'Advanced' },
-    },
   },
 } satisfies Meta<typeof Input>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// --- Stories --------------------------------------------------------------------
+
 export const Playground: Story = {
   render: ({ iconLeft, iconRight, ...args }) => (
-    <View className="max-w-80">
+    <Frame>
       <Input
         {...args}
-        iconLeft={iconLeft ? <Icon name="chevron-left" /> : undefined}
-        iconRight={iconRight ? <Icon name="chevron-right" /> : undefined}
+        iconLeft={demoIcon('chevron-left', iconLeft)}
+        iconRight={demoIcon('chevron-right', iconRight)}
       />
-    </View>
+    </Frame>
   ),
 };
 
 export const Variants: Story = {
   render: (args) => (
-    <View className="gap-6 max-w-80">
+    <Frame>
       <Input {...args} label="Outlined" variant="outlined" helperText="Default MUI variant" />
       <Input {...args} label="Filled" variant="filled" helperText="Background fills on the field" />
       <Input {...args} label="Standard" variant="standard" helperText="Underline only" />
-    </View>
-  ),
-};
-
-export const States: Story = {
-  render: (args) => (
-    <View className="gap-6 max-w-80">
-      <Input
-        {...args}
-        label="Error"
-        error
-        defaultValue="not-an-email"
-        helperText="Please enter a valid email address"
-      />
-      <Input {...args} label="Disabled" disabled placeholder="Cannot edit" helperText="This field is disabled" />
-      <Input {...args} label="Required" required placeholder="Required field" helperText="Marked with an asterisk" />
-    </View>
-  ),
-};
-
-export const WithIcons: Story = {
-  render: (args) => (
-    <View className="gap-6 max-w-80">
-      <Input {...args} label="Search" placeholder="Search…" iconLeft={<Icon name="magnifier" />} />
-      <Input {...args} label="Select" placeholder="Choose…" iconRight={<Icon name="eye" />} />
-    </View>
+    </Frame>
   ),
 };
 
 export const Tones: Story = {
   render: (args) => (
-    <View className="gap-6 max-w-80">
+    <Frame>
       {tones.map((tone) => (
         <InputView
           key={tone}
@@ -162,6 +144,31 @@ export const Tones: Story = {
           helperText="Keyboard-focus preview"
         />
       ))}
-    </View>
+    </Frame>
+  ),
+};
+
+export const WithIcons: Story = {
+  render: (args) => (
+    <Frame>
+      <Input {...args} label="Search" placeholder="Search…" iconLeft={<Icon name="magnifier" />} />
+      <Input {...args} label="Select" placeholder="Choose…" iconRight={<Icon name="eye" />} />
+    </Frame>
+  ),
+};
+
+export const States: Story = {
+  render: (args) => (
+    <Frame>
+      <Input
+        {...args}
+        label="Error"
+        error
+        defaultValue="not-an-email"
+        helperText="Please enter a valid email address"
+      />
+      <Input {...args} label="Disabled" disabled placeholder="Cannot edit" helperText="This field is disabled" />
+      <Input {...args} label="Required" required placeholder="Required field" helperText="Marked with an asterisk" />
+    </Frame>
   ),
 };

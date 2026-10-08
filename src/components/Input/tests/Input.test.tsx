@@ -4,6 +4,9 @@ import { InputView, LabelText } from '../Input';
 
 type AnyElement = ReactElement & { props: Record<string, unknown> };
 
+// --- Element tree helpers -------------------------------------------------------
+// Tests drive InputView directly and navigate the returned element tree.
+
 const renderedChildren = (node: unknown): unknown[] =>
   [(node as AnyElement).props?.children]
     .flat()
@@ -60,6 +63,8 @@ const renderView = (props: Parameters<typeof InputView>[0]) =>
   InputView(props) as unknown as AnyElement;
 
 describe('Input', () => {
+  // --- Label placement (MUI) ------------------------------------------------------
+
   it('shrinks the label above the field for the standard variant once filled', () => {
     const element = renderView({ label: 'Email', variant: 'standard', focused: false, filled: true });
     const labelEl = findLabel(element);
@@ -81,13 +86,6 @@ describe('Input', () => {
     expect(findTextInput(fieldRow).props.className).toContain('pt-5');
   });
 
-  it('keeps the label inside filled and standard fields while empty', () => {
-    for (const variant of ['filled', 'standard'] as const) {
-      const element = renderView({ label: 'Email', variant, focused: false });
-      expect(findLabelWrapper(element)).toBeTruthy();
-    }
-  });
-
   it('places the label on the border notch for the outlined variant once filled', () => {
     const element = renderView({ label: 'Email', variant: 'outlined', focused: false, filled: true });
     const fieldRow = findFieldRow(element);
@@ -99,6 +97,80 @@ describe('Input', () => {
     expect(wrapper?.props.className).toContain('bg-background-surface');
     expect(findLabel(element).props.text).toBe('Email');
   });
+
+  it('keeps the label inside the field while empty (MUI unshrunk label)', () => {
+    const element = renderView({ label: 'Email', variant: 'outlined', focused: false });
+    const fieldRow = findFieldRow(element);
+    const input = findTextInput(fieldRow);
+    expect(input.props.placeholder).toBeUndefined();
+
+    const overlay = findLabelWrapper(element);
+    expect(overlay).toBeTruthy();
+    expect(overlay?.props.pointerEvents).toBe('none');
+    const labelText = (renderedChildren(overlay) as AnyElement[])[0];
+    expect(labelText.props.text).toBe('Email');
+    expect(labelText.props.className).toContain('text-text-secondary');
+  });
+
+  it('keeps the label inside filled and standard fields while empty', () => {
+    for (const variant of ['filled', 'standard'] as const) {
+      const element = renderView({ label: 'Email', variant, focused: false });
+      expect(findLabelWrapper(element)).toBeTruthy();
+    }
+  });
+
+  it('passes an explicit placeholder through to the TextInput untouched', () => {
+    const element = renderView({
+      label: 'Email',
+      placeholder: 'you@example.com',
+      focused: false,
+    });
+    expect(findTextInput(findFieldRow(element)).props.placeholder).toBe('you@example.com');
+  });
+
+  it('hides the unshrunk label when a placeholder occupies the empty field', () => {
+    const element = renderView({
+      label: 'Email',
+      placeholder: 'you@example.com',
+      focused: false,
+    });
+    expect(findLabelWrapper(element)).toBeUndefined();
+  });
+
+  it('shows the shrunk label once filled even when a placeholder is set', () => {
+    const element = renderView({
+      label: 'Email',
+      placeholder: 'you@example.com',
+      focused: false,
+      filled: true,
+    });
+    // The notch label renders inside the field row once the field has a value.
+    const labelEl = findLabel(element);
+    expect(labelEl.props.text).toBe('Email');
+  });
+
+  it('appends an error-toned asterisk to the label when required', () => {
+    const element = renderView({ label: 'Email', required: true, variant: 'standard', focused: false, filled: true });
+    expect(findLabel(element).props.required).toBe(true);
+
+    const labelText = LabelText({ text: 'Email', required: true, className: '' }) as unknown as AnyElement;
+    const asterisk = [labelText.props.children as ReactNode]
+      .flat()
+      .filter(Boolean)
+      .find((child) => typeof child === 'object') as AnyElement;
+    expect(asterisk.props.children).toBe(' *');
+    expect(asterisk.props.className).toContain('text-palette-error-main');
+  });
+
+  it('marks the unshrunk label with an asterisk when required and empty', () => {
+    const element = renderView({ label: 'Email', required: true, focused: false });
+    const overlay = findLabelWrapper(element);
+    const labelText = (renderedChildren(overlay) as AnyElement[])[0];
+    expect(labelText.props.text).toBe('Email');
+    expect(labelText.props.required).toBe(true);
+  });
+
+  // --- Notch border segments --------------------------------------------------------
 
   it('splits the border into segments around the measured transparent label', () => {
     const element = renderView({
@@ -136,6 +208,8 @@ describe('Input', () => {
     expect(pieces[2].props.className).toContain('border-t-2');
   });
 
+  // --- States & colors --------------------------------------------------------------
+
   it('renders helper text below the field', () => {
     const element = renderView({ helperText: 'We never share it.', focused: false });
     const kids = renderedChildren(element) as AnyElement[];
@@ -172,6 +246,14 @@ describe('Input', () => {
     );
     expect(labelEl.props.className).toContain('text-palette-error-main');
     expect(helperEl.props.className).toContain('text-palette-error-main');
+  });
+
+  it('marks the input aria-invalid when error is set', () => {
+    const element = renderView({ label: 'Email', error: true, focused: false, filled: true });
+    expect(findTextInput(findFieldRow(element)).props['aria-invalid']).toBe(true);
+
+    const valid = renderView({ label: 'Email', focused: false });
+    expect(findTextInput(findFieldRow(valid)).props['aria-invalid']).toBeUndefined();
   });
 
   it('thickens the tone border on any focus and deepens it for keyboard focus', () => {
@@ -215,89 +297,7 @@ describe('Input', () => {
     expect(fieldRow.props.className).toContain('border-text-disabled');
   });
 
-  it('renders adornment icons inside the field row', () => {
-    const element = renderView({ iconLeft: '🔍', iconRight: '⌄', focused: false });
-    const kids = renderedChildren(findFieldRow(element));
-    expect(kids[0]).toBe('🔍');
-    expect(kids[kids.length - 1]).toBe('⌄');
-  });
-
-  it('wires the label as the accessibility label unless one is provided', () => {
-    const implicit = renderView({ label: 'Email', focused: false });
-    expect(findTextInput(findFieldRow(implicit)).props.accessibilityLabel).toBe('Email');
-
-    const explicit = renderView({
-      label: 'Email',
-      accessibilityLabel: 'Work email address',
-      focused: false,
-    });
-    expect(findTextInput(findFieldRow(explicit)).props.accessibilityLabel).toBe('Work email address');
-  });
-
-  it('appends an error-toned asterisk to the label when required', () => {
-    const element = renderView({ label: 'Email', required: true, variant: 'standard', focused: false, filled: true });
-    expect(findLabel(element).props.required).toBe(true);
-
-    const labelText = LabelText({ text: 'Email', required: true, className: '' }) as unknown as AnyElement;
-    const asterisk = [labelText.props.children as ReactNode]
-      .flat()
-      .filter(Boolean)
-      .find((child) => typeof child === 'object') as AnyElement;
-    expect(asterisk.props.children).toBe(' *');
-    expect(asterisk.props.className).toContain('text-palette-error-main');
-  });
-
-  it('keeps the label inside the field while empty (MUI unshrunk label)', () => {
-    const element = renderView({ label: 'Email', variant: 'outlined', focused: false });
-    const fieldRow = findFieldRow(element);
-    const input = findTextInput(fieldRow);
-    expect(input.props.placeholder).toBeUndefined();
-
-    const overlay = findLabelWrapper(element);
-    expect(overlay).toBeTruthy();
-    expect(overlay?.props.pointerEvents).toBe('none');
-    const labelText = (renderedChildren(overlay) as AnyElement[])[0];
-    expect(labelText.props.text).toBe('Email');
-    expect(labelText.props.className).toContain('text-text-secondary');
-  });
-
-  it('passes an explicit placeholder through to the TextInput untouched', () => {
-    const element = renderView({
-      label: 'Email',
-      placeholder: 'you@example.com',
-      focused: false,
-    });
-    expect(findTextInput(findFieldRow(element)).props.placeholder).toBe('you@example.com');
-  });
-
-  it('hides the unshrunk label when a placeholder occupies the empty field', () => {
-    const element = renderView({
-      label: 'Email',
-      placeholder: 'you@example.com',
-      focused: false,
-    });
-    expect(findLabelWrapper(element)).toBeUndefined();
-  });
-
-  it('shows the shrunk label once filled even when a placeholder is set', () => {
-    const element = renderView({
-      label: 'Email',
-      placeholder: 'you@example.com',
-      focused: false,
-      filled: true,
-    });
-    // The notch label renders inside the field row once the field has a value.
-    const labelEl = findLabel(element);
-    expect(labelEl.props.text).toBe('Email');
-  });
-
-  it('marks the unshrunk label with an asterisk when required and empty', () => {
-    const element = renderView({ label: 'Email', required: true, focused: false });
-    const overlay = findLabelWrapper(element);
-    const labelText = (renderedChildren(overlay) as AnyElement[])[0];
-    expect(labelText.props.text).toBe('Email');
-    expect(labelText.props.required).toBe(true);
-  });
+  // --- Frame & padding -----------------------------------------------------------------
 
   it('applies the small frame and text size', () => {
     const element = renderView({ size: 'small', focused: false });
@@ -366,5 +366,26 @@ describe('Input', () => {
     const standardClasses = String(findFieldRow(standard).props.className).split(' ');
     expect(standardClasses).toContain('border-b');
     expect(standardClasses).toContain('bg-transparent');
+  });
+
+  // --- Adornments & accessibility wiring -------------------------------------------------
+
+  it('renders adornment icons inside the field row', () => {
+    const element = renderView({ iconLeft: '🔍', iconRight: '⌄', focused: false });
+    const kids = renderedChildren(findFieldRow(element));
+    expect(kids[0]).toBe('🔍');
+    expect(kids[kids.length - 1]).toBe('⌄');
+  });
+
+  it('wires the label as the accessibility label unless one is provided', () => {
+    const implicit = renderView({ label: 'Email', focused: false });
+    expect(findTextInput(findFieldRow(implicit)).props.accessibilityLabel).toBe('Email');
+
+    const explicit = renderView({
+      label: 'Email',
+      accessibilityLabel: 'Work email address',
+      focused: false,
+    });
+    expect(findTextInput(findFieldRow(explicit)).props.accessibilityLabel).toBe('Work email address');
   });
 });

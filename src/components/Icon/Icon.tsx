@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 import Svg, { Path, type SvgProps } from 'react-native-svg';
 import { iconPaths, type IconName } from './paths';
 
-export type IconSize = 'sm' | 'md' | 'lg';
+export type IconSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export type IconTone =
   | 'inherit'
   | 'primary'
@@ -18,6 +18,8 @@ const sizeValues: Record<IconSize, number> = {
   sm: 16,
   md: 20,
   lg: 24,
+  xl: 32,
+  xxl: 40,
 };
 
 // Theme-adaptive classes: resolve through per-theme CSS variables.
@@ -38,9 +40,12 @@ export type IconProps = {
   tone?: IconTone;
   className?: string;
   accessibilityLabel?: string;
+  /** Reserved for custom SVG content; not rendered today. */
   children?: ReactNode;
 };
 
+/** Registry icon from paths.ts. Decorative (hidden from assistive technology)
+ * unless accessibilityLabel makes it meaningful. */
 export function Icon({
   name,
   size = 'md',

@@ -11,6 +11,7 @@
     "lib",
     "src"
   ],
+  "sideEffects": false,
   "scripts": {
     "build": "bob build && npm run copy-tokens",
     "copy-tokens": "node scripts/copy-tokens.js",

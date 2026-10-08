@@ -3,7 +3,19 @@ import { Text, View } from 'react-native';
 import { Icon } from '../Icon';
 import { iconPaths, type IconName } from '../paths';
 
+// Control options derive from the registry and the tone set.
 const names = Object.keys(iconPaths) as IconName[];
+const tones = [
+  'inherit',
+  'primary',
+  'secondary',
+  'error',
+  'warning',
+  'info',
+  'success',
+  'muted',
+  'inverse',
+] as const;
 
 const meta = {
   title: 'Components/Icon',
@@ -19,19 +31,14 @@ const meta = {
       options: names,
       table: { category: 'Content' },
     },
-    children: {
-      control: false,
-      description: 'Custom SVG content (reserved — not rendered by the component today)',
-      table: { category: 'Content' },
-    },
     size: {
       control: 'select',
-      options: ['sm', 'md', 'lg'],
+      options: ['sm', 'md', 'lg', 'xl', 'xxl'],
       table: { category: 'Appearance' },
     },
     tone: {
       control: 'select',
-      options: ['inherit', 'primary', 'secondary', 'error', 'warning', 'info', 'success', 'muted', 'inverse'],
+      options: tones,
       table: { category: 'Appearance' },
     },
     accessibilityLabel: {
@@ -41,7 +48,7 @@ const meta = {
     },
     className: {
       control: 'text',
-      description: 'Extra NativeWind classes merged last',
+      description: 'Extra NativeWind classes on the Svg, merged last',
       table: { category: 'Advanced' },
     },
   },
@@ -49,6 +56,8 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+// --- Stories --------------------------------------------------------------------
 
 export const Playground: Story = {};
 
@@ -64,8 +73,6 @@ export const Gallery: Story = {
     </View>
   ),
 };
-
-const tones = ['inherit', 'primary', 'secondary', 'error', 'warning', 'info', 'success', 'muted', 'inverse'] as const;
 
 export const Tones: Story = {
   render: (args) => (

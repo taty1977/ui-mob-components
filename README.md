@@ -114,6 +114,10 @@ MUI-style text field (label, helper text, error state, adornments) built on
 | `iconLeft` / `iconRight` | `ReactNode` | — | Adornments; the icon side gets 50% less padding |
 | `className` / `inputClassName` | `string` | — | Extra NativeWind classes on the wrapper / the `TextInput` |
 
+When `error` is set, the underlying input is also marked `aria-invalid` (web),
+so form libraries like react-hook-form get an accessible invalid state via the
+`Controller` pattern for free.
+
 ### Icon
 
 | Prop | Type | Default | Notes |

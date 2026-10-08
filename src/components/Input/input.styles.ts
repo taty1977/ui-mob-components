@@ -1,8 +1,23 @@
+// --- Types ----------------------------------------------------------------------
+
 export type InputVariant = 'outlined' | 'filled' | 'standard';
 export type InputSize = 'small' | 'normal';
 export type InputTone = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
 
-// Field frames: small 44px, normal 48px.
+/** Border/label classes per tone. */
+export type ToneClasses = {
+  border: string;
+  strongBorder: string;
+  hoverBorder: string;
+  groupHoverBorder: string;
+  text: string;
+};
+
+export type InFieldLabelPlacement = 'notch' | 'filledTop' | 'unshrunk';
+
+// --- Frame & spacing --------------------------------------------------------------
+
+// Field frames: 44px (small), 48px (normal).
 export const fieldFrame: Record<InputVariant, Record<InputSize, string>> = {
   outlined: {
     small: 'min-h-11 py-2',
@@ -44,18 +59,22 @@ export const inputTextSize: Record<InputSize, string> = {
   normal: 'text-18',
 };
 
+// --- Variant Base & borders -------------------------------------------------------
+
 export const variantBase: Record<InputVariant, string> = {
   outlined: 'relative rounded-md bg-background-surface',
   filled: 'relative rounded-t-md bg-action-hover',
   standard: 'relative bg-transparent',
 };
 
+// Any focus doubles the border width (MUI focus behavior).
 export const borderWidthClasses: Record<InputVariant, { rest: string; focus: string }> = {
   outlined: { rest: 'border', focus: 'border-2' },
   filled: { rest: 'border-b', focus: 'border-b-2' },
   standard: { rest: 'border-b', focus: 'border-b-2' },
 };
 
+// The outlined notch border is drawn as three segments (see Input.tsx).
 export const notchPieceWidthClasses: Record<
   'rest' | 'focus',
   { left: string; bottom: string; right: string }
@@ -72,16 +91,10 @@ export const notchPieceWidthClasses: Record<
   },
 };
 
+// --- Tones ----------------------------------------------------------------------------
+
 // Resting borders carry the tone; hover and keyboard focus deepen it.
 // 'disabled' is a pseudo-tone so every field state resolves through one map.
-export type ToneClasses = {
-  border: string;
-  strongBorder: string;
-  hoverBorder: string;
-  groupHoverBorder: string;
-  text: string;
-};
-
 export const toneClasses: Record<InputTone | 'disabled', ToneClasses> = {
   primary: {
     border: 'border-palette-primary-main',
@@ -134,14 +147,15 @@ export const toneClasses: Record<InputTone | 'disabled', ToneClasses> = {
   },
 };
 
+// --- Label placement --------------------------------------------------------------------
+
 /** Horizontal offset of the outlined notch label (left-3), in px. */
 export const NOTCH_LABEL_LEFT = 12;
 
 /** Where the label sits once the field has a value, per variant. */
 export const shrunkPlacement = { outlined: 'notch', filled: 'filledTop', standard: 'above' } as const;
 
-export type InFieldLabelPlacement = 'notch' | 'filledTop' | 'unshrunk';
-
+// Wrapper classes for the in-field label positions.
 export const inFieldLabelWrapper: Record<InFieldLabelPlacement, string> = {
   notch: 'absolute -top-2 left-3 z-10',
   filledTop: 'absolute top-1',

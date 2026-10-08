@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
 import { Text, View } from 'react-native';
 import { Button } from '../Button';
@@ -5,6 +6,13 @@ import { Icon } from '../../Icon';
 
 const tones = ['primary', 'secondary', 'info', 'success', 'warning', 'error'] as const;
 const variants = ['default', 'label', 'outline', 'text'] as const;
+
+// Icon node for the iconLeft/iconRight boolean demo controls.
+const demoIcon = (
+  name: 'chevron-left' | 'chevron-right',
+  show: unknown,
+  size: ComponentProps<typeof Icon>['size'],
+) => (show ? <Icon name={name} size={size} /> : undefined);
 
 const meta = {
   title: 'Components/Button',
@@ -58,7 +66,7 @@ const meta = {
     },
     className: {
       control: 'text',
-      description: 'Extra NativeWind classes merged last',
+      description: 'Extra NativeWind classes on the Pressable, merged last',
       table: { category: 'Advanced' },
     },
   },
@@ -67,22 +75,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// --- Stories --------------------------------------------------------------------
+
 export const Playground: Story = {
   render: ({ iconLeft, iconRight, size, ...args }) => (
     <Button
       {...args}
       size={size}
-      iconLeft={iconLeft ? <Icon name="chevron-left" size={size ?? 'md'} /> : undefined}
-      iconRight={iconRight ? <Icon name="chevron-right" size={size ?? 'md'} /> : undefined}
+      iconLeft={demoIcon('chevron-left', iconLeft, size)}
+      iconRight={demoIcon('chevron-right', iconRight, size)}
     />
   ),
-};
-
-export const Disabled: Story = {
-  args: {
-    label: 'Unavailable',
-    disabled: true,
-  },
 };
 
 export const VariantMatrix: Story = {
@@ -110,22 +113,14 @@ export const VariantMatrix: Story = {
   ),
 };
 
-export const Accessibility: Story = {
-  args: {
-    label: 'Save changes',
-    accessibilityLabel: 'Save changes to your profile',
-    accessibilityHint: 'Saves the current profile details',
-  },
-};
-
 export const WithIcons: Story = {
   render: ({ iconLeft, iconRight, size, ...args }) => (
     <View className="gap-5">
       <Button
         {...args}
         size={size}
-        iconLeft={iconLeft ? <Icon name="chevron-left" size={size ?? 'md'} /> : undefined}
-        iconRight={iconRight ? <Icon name="chevron-right" size={size ?? 'md'} /> : undefined}
+        iconLeft={demoIcon('chevron-left', iconLeft, size)}
+        iconRight={demoIcon('chevron-right', iconRight, size)}
       />
       <View className="gap-2">
         <Text className="text-13 font-semibold text-light-text-secondary">
@@ -149,4 +144,19 @@ export const WithIcons: Story = {
       </View>
     </View>
   ),
+};
+
+export const Disabled: Story = {
+  args: {
+    label: 'Unavailable',
+    disabled: true,
+  },
+};
+
+export const Accessibility: Story = {
+  args: {
+    label: 'Save changes',
+    accessibilityLabel: 'Save changes to your profile',
+    accessibilityHint: 'Saves the current profile details',
+  },
 };

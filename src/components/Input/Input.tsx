@@ -1,5 +1,5 @@
 import { useState, type ReactElement, type ReactNode, type Ref } from 'react';
-import { Text, TextInput, View, type LayoutChangeEvent, type TextInputProps } from 'react-native';
+import { Platform, Text, TextInput, View, type LayoutChangeEvent, type TextInputProps } from 'react-native';
 import { isKeyboardModality } from '../../utils/focusModality';
 import { LabelText } from './LabelText';
 import {
@@ -48,11 +48,9 @@ export type InputViewProps = InputProps & {
   focused: boolean;
   /** Keyboard (Tab) focus only; pointer/touch focus leaves this false. */
   focusVisible?: boolean;
-  /** Has a value; the label shrinks only when filled. */
   filled?: boolean;
-  /** Measured notch-label width; until set, the label covers the border with a surface bg. */
+  /** Until measured, the label covers the border with a surface bg. */
   notchWidth?: number;
-  /** Reports the notch label's layout width for the outlined variant. */
   onNotchLabelLayout?: (event: LayoutChangeEvent) => void;
 };
 
@@ -80,8 +78,7 @@ export function InputView({
   ref,
   ...props
 }: InputViewProps): ReactElement {
-  // Label placement: shrinks (notch / box top / above field) only when
-  // filled; while empty it overlays the field, unless a placeholder shows.
+  // --- Label placement ---
   const labelPlacement: InFieldLabelPlacement | 'above' | undefined =
     !label || (!filled && Boolean(placeholder))
       ? undefined
@@ -90,7 +87,7 @@ export function InputView({
         : 'unshrunk';
   const notchLabel = labelPlacement === 'notch';
 
-  // All state colors resolve through one map entry (Button-style).
+  // --- Colors ---
   const toneStyle = toneClasses[disabled ? 'disabled' : error ? 'error' : tone];
 
   const borderTone =
@@ -98,18 +95,14 @@ export function InputView({
   const labelTone = disabled || error || focused ? toneStyle.text : 'text-text-secondary';
   const helperTone = disabled || error ? toneStyle.text : 'text-text-secondary';
 
-  // Carried on the row so adornment icons using currentColor inherit it.
   const iconTone = disabled ? toneStyle.text : 'text-text-secondary';
 
-  // Measured: three border segments leave a real gap behind the transparent
-  // label; pre-measure, the label covers the border with a surface bg.
+  // --- Field frame ---
   const notchGap = notchLabel && notchWidth != null;
 
-  // Any focus doubles the border width (MUI focus behavior).
   const borderWidth = borderWidthClasses[variant][focused ? 'focus' : 'rest'];
   const notchPieceWidth = notchPieceWidthClasses[focused ? 'focus' : 'rest'];
 
-  // Standard stays flush without icons; icons get the reduced side padding.
   const paddingLeft =
     variant === 'standard' && !iconLeft
       ? undefined
@@ -149,8 +142,7 @@ export function InputView({
       .filter(Boolean)
       .join(' ');
 
-  // Shrunk labels sit at the plain padding edge; the unshrunk label follows
-  // the icon-reduced left padding, shifted past a start adornment.
+  // --- Label offsets ---
   const padPx = HORIZONTAL_PADDING[size];
   const labelEdgePadding = variant === 'standard' ? 0 : padPx.plain;
   const leftPaddingPx =
@@ -159,7 +151,7 @@ export function InputView({
     variant === 'standard' && !iconRight ? 0 : iconRight ? padPx.withIcon : padPx.plain;
   const unshrunkLeft = leftPaddingPx + (iconLeft ? (size === 'small' ? 28 : 34) : 0);
 
-  // Filled reserves label space inside the box when a label is present.
+  // --- Input ---
   const filledInputPadding = label ? 'pt-5' : 'py-1';
 
   const inputClasses = [
@@ -172,6 +164,11 @@ export function InputView({
     .filter(Boolean)
     .join(' ');
 
+  // Web-only: RN has no "invalid" a11y state.
+  const invalidProps =
+    Platform.OS === 'web' && error ? ({ 'aria-invalid': true } as const) : undefined;
+
+  // --- In-field label config ---
   const inFieldLabel =
     label &&
     (labelPlacement === 'notch' ||
@@ -256,6 +253,7 @@ export function InputView({
           placeholder={placeholder}
           placeholderClassName="text-text-disabled"
           {...props}
+          {...invalidProps}
           editable={!disabled}
           ref={ref}
         />
@@ -268,10 +266,7 @@ export function InputView({
   );
 }
 
-/** MUI-style text field: label, helper text, error/disabled/required states,
- * outlined/filled/standard variants, and start/end adornments. Focus, filled,
- * and notch width are tracked internally; every other TextInput prop passes
- * straight through. */
+/** MUI-style text field; every TextInput prop passes straight through. */
 export function Input({
   defaultValue,
   onBlur,

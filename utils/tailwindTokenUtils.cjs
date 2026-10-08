@@ -1,3 +1,6 @@
+// --- Shared helpers ---------------------------------------------------------
+
+// Flatten { name: { $value } } token groups to name -> value, dropping $type.
 const tokenValues = (tokens) =>
   Object.fromEntries(
     Object.entries(tokens)
@@ -5,14 +8,7 @@ const tokenValues = (tokens) =>
       .map(([name, token]) => [name, token.$value]),
   );
 
-const colorScale = (tokens, prefix) =>
-  Object.fromEntries(
-    Object.entries(tokenValues(tokens)).map(([name, value]) => [
-      name.replace(`${prefix}-`, ''),
-      value,
-    ]),
-  );
-
+// Resolve "{A.B.C}" token references recursively to their final value.
 const resolveTokenReference = (figmaTokens, value) => {
   const reference = value.match(/^\{(.+)\}$/);
   if (!reference) return value;
@@ -31,6 +27,18 @@ const resolveTokenReference = (figmaTokens, value) => {
   return resolveTokenReference(figmaTokens, target.$value);
 };
 
+// --- Colors -----------------------------------------------------------------
+
+// Turn { primary-100: v } into { 100: v }.
+const colorScale = (tokens, prefix) =>
+  Object.fromEntries(
+    Object.entries(tokenValues(tokens)).map(([name, value]) => [
+      name.replace(`${prefix}-`, ''),
+      value,
+    ]),
+  );
+
+// Resolve every Color-Palette reference to its hex value.
 const colorPalette = (figmaTokens, tokens) =>
   Object.fromEntries(
     Object.entries(tokenValues(tokens)).map(([name, value]) => [
@@ -39,6 +47,7 @@ const colorPalette = (figmaTokens, tokens) =>
     ]),
   );
 
+// Semantic color tree for one theme mode; drives the light-*/dark-* classes.
 const themeColors = (figmaTokens, mode) => {
   const variables = figmaTokens.Variables[mode];
   const primitives = figmaTokens.Primitives[mode];
@@ -77,8 +86,7 @@ const themeColors = (figmaTokens, mode) => {
   };
 };
 
-// CSS variables for every semantic color, per theme mode: --text-primary,
-// --palette-primary-main, --action-hover, ... (flattened themeColors tree).
+// Flatten the color tree into CSS vars for one mode (--palette-primary-main, ...).
 const colorVariablesForMode = (figmaTokens, mode) => {
   const flatten = (obj, path, out) => {
     for (const [key, value] of Object.entries(obj)) {
@@ -91,9 +99,8 @@ const colorVariablesForMode = (figmaTokens, mode) => {
   return flatten(themeColors(figmaTokens, mode), [], {});
 };
 
-// Same tree shape as themeColors, but values are var(--...) references, so the
-// generated utilities follow the active theme (the .light/.dark class flips
-// the variables). Produces classes like text-palette-primary-main.
+// Same color tree but with var(--...) values, so unprefixed classes
+// (text-palette-primary-main) follow the active .light/.dark theme.
 const adaptiveColors = (figmaTokens) => {
   const build = (obj, path) =>
     Object.fromEntries(
@@ -107,6 +114,9 @@ const adaptiveColors = (figmaTokens) => {
   return build(themeColors(figmaTokens, 'Light'), []);
 };
 
+// --- Dimensions (spacing, radius) -------------------------------------------
+
+// Strip the group prefix from dimension token names.
 const dimensionScale = (tokens) =>
   Object.fromEntries(
     Object.entries(tokenValues(tokens)).map(([name, value]) => [
@@ -115,6 +125,7 @@ const dimensionScale = (tokens) =>
     ]),
   );
 
+// Spacing/radius utilities as var(--...) references (union across modes).
 const dimensions = (figmaTokens, primitiveName, variablePrefix) => {
   const names = [
     ...new Set(
@@ -129,6 +140,7 @@ const dimensions = (figmaTokens, primitiveName, variablePrefix) => {
   );
 };
 
+// --spacing-*/--radius-* vars for one mode.
 const dimensionVariablesForMode = (figmaTokens, mode) => {
   const primitives = figmaTokens.Primitives[mode];
   const spacing = dimensionScale(primitives.Gap);
@@ -144,6 +156,9 @@ const dimensionVariablesForMode = (figmaTokens, mode) => {
   };
 };
 
+// --- Typography (size, weight, line-height) ---------------------------------
+
+// --<prefix>-<name> vars from a typography scale.
 const scaleVariables = (tokens, prefix) =>
   Object.fromEntries(
     Object.entries(tokenValues(tokens)).map(([name, value]) => [
@@ -152,6 +167,7 @@ const scaleVariables = (tokens, prefix) =>
     ]),
   );
 
+// Font family + size/weight/line-height vars for one mode.
 const typographyVariablesForMode = (figmaTokens, mode) => {
   const typography = figmaTokens.Primitives[mode].Typography;
 
@@ -163,12 +179,7 @@ const typographyVariablesForMode = (figmaTokens, mode) => {
   };
 };
 
-const variablesForMode = (figmaTokens, mode) => ({
-  ...typographyVariablesForMode(figmaTokens, mode),
-  ...dimensionVariablesForMode(figmaTokens, mode),
-  ...colorVariablesForMode(figmaTokens, mode),
-});
-
+// fontSize/fontWeight/lineHeight utilities as var(--...) references (union across modes).
 const scaleUtilities = (figmaTokens, scaleName) => {
   const names = [
     ...new Set(
@@ -182,6 +193,15 @@ const scaleUtilities = (figmaTokens, scaleName) => {
     names.map((name) => [name, `var(--${scaleName}-${name})`]),
   );
 };
+
+// --- Composition --------------------------------------------------------------
+
+// All CSS vars for one mode; the tailwind plugin writes them under .light/.dark.
+const variablesForMode = (figmaTokens, mode) => ({
+  ...typographyVariablesForMode(figmaTokens, mode),
+  ...dimensionVariablesForMode(figmaTokens, mode),
+  ...colorVariablesForMode(figmaTokens, mode),
+});
 
 module.exports = {
   adaptiveColors,
