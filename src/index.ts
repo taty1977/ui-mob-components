@@ -1,4 +1,4 @@
-export { Button, Icon, iconPaths, Input } from './components';
+export { Button, Icon, iconPaths, Input, Logo, Splash } from './components';
 export type {
 	ButtonProps,
 	ButtonSize,
@@ -12,6 +12,9 @@ export type {
 	InputSize,
 	InputTone,
 	InputVariant,
+	LogoProps,
+	LogoVariant,
+	SplashProps,
 } from './components';
 export {
 	darkTheme,
