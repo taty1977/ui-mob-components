@@ -1,4 +1,4 @@
-export { Button, Icon, iconPaths, Input, Logo, Splash } from './components';
+export { Button, Icon, iconPaths, Input, Logo, Splash, Stepper } from './components';
 export type {
 	ButtonProps,
 	ButtonSize,
@@ -15,6 +15,9 @@ export type {
 	LogoProps,
 	LogoVariant,
 	SplashProps,
+	StepperProps,
+	StepperStep,
+	StepperTone,
 } from './components';
 export {
 	darkTheme,

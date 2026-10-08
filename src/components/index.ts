@@ -13,3 +13,5 @@ export { Logo } from './Logo';
 export type { LogoProps, LogoVariant } from './Logo';
 export { Splash } from './Splash';
 export type { SplashProps } from './Splash';
+export { Stepper } from './Stepper';
+export type { StepperProps, StepperStep, StepperTone } from './Stepper';
