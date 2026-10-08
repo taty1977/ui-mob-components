@@ -58,6 +58,16 @@ src/
       LabelText.tsx         # shared label with required asterisk
       stories/
       tests/
+    Logo/
+      Logo.tsx              # AllInOne Health mark + wordmark
+      index.ts
+      stories/
+      tests/
+    Splash/
+      Splash.tsx            # SplashView (stateless) + Splash (Animated wrapper)
+      index.ts
+      stories/
+      tests/
   themes/                   # Figma token -> theme mapping (light/dark)
 tokens/figma/tokens.json    # exported Figma variables
 ```
@@ -65,7 +75,7 @@ tokens/figma/tokens.json    # exported Figma variables
 ## Usage
 
 ```tsx
-import { Button, Icon, Input } from 'ui-mob-components';
+import { Button, Icon, Input, Logo } from 'ui-mob-components';
 
 <Button label="Save" tone="primary" variant="default" />
 <Button
@@ -75,8 +85,7 @@ import { Button, Icon, Input } from 'ui-mob-components';
   iconRight={<Icon name="chevron-right" />}
 />
 <Input label="Email" helperText="We never share it" />
-<Input label="Search" iconLeft={<Icon name="chevron-left" />} tone="secondary" />
-```
+<Input label="Search" iconLeft={<Icon name="chevron-left" />} tone="secondary" /><Logo size={48} />```
 
 ### Button
 

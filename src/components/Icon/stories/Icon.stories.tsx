@@ -31,6 +31,11 @@ const meta = {
       options: names,
       table: { category: 'Content' },
     },
+    children: {
+      control: false,
+      description: 'Custom SVG content rendered instead of the built-in path',
+      table: { category: 'Content' },
+    },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg', 'xl', 'xxl'],

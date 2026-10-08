@@ -146,13 +146,6 @@ export const WithIcons: Story = {
   ),
 };
 
-export const Disabled: Story = {
-  args: {
-    label: 'Unavailable',
-    disabled: true,
-  },
-};
-
 export const Accessibility: Story = {
   args: {
     label: 'Save changes',

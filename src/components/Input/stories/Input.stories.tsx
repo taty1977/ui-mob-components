@@ -99,6 +99,11 @@ const meta = {
       description: 'Extra NativeWind classes on the TextInput itself',
       table: { category: 'Advanced' },
     },
+    ref: {
+      control: false,
+      description: 'Ref to the underlying TextInput (focus, blur, clear programmatically)',
+      table: { category: 'Advanced' },
+    },
   },
 } satisfies Meta<typeof Input>;
 

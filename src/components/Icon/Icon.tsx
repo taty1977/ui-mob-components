@@ -40,7 +40,7 @@ export type IconProps = {
   tone?: IconTone;
   className?: string;
   accessibilityLabel?: string;
-  /** Reserved for custom SVG content; not rendered today. */
+  /** Custom SVG content rendered instead of the built-in registry path. */
   children?: ReactNode;
 };
 
@@ -52,6 +52,7 @@ export function Icon({
   tone = 'inherit',
   className,
   accessibilityLabel,
+  children,
 }: IconProps): ReactElement<SvgProps> {
   const dimension = sizeValues[size];
   const colorClass = tone === 'inherit' ? undefined : toneClasses[tone];
@@ -73,7 +74,7 @@ export function Icon({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={decorative ? 'none' : 'image'}
     >
-      <Path d={iconPaths[name]} />
+      {children ?? <Path d={iconPaths[name]} />}
     </Svg>
   );
 }

@@ -34,6 +34,16 @@ describe('Icon', () => {
     expect(renderIcon({ name: 'plus' }).props.fill).toBe('currentColor');
   });
 
+  it('renders custom children instead of the registry path', () => {
+    const element = renderIcon({ name: 'plus', children: 'CUSTOM-CONTENT' });
+    expect(element.props.children).toBe('CUSTOM-CONTENT');
+
+    const pathEl = renderIcon({ name: 'plus' }).props.children as {
+      props: Record<string, unknown>;
+    };
+    expect(pathEl.props.d).toBe(iconPaths.plus);
+  });
+
   // --- Styling -------------------------------------------------------------------
 
   it('applies a tone class unless tone is inherit', () => {
