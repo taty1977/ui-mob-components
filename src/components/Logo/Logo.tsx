@@ -82,7 +82,10 @@ export function Logo({
         >
           {'AllInOne '}<Text style={{ color: MARK_RING }}>Health</Text>
         </Text>
-        <Text className={textClass('text-12 font-medium uppercase tracking-wider text-text-secondary')}>
+        <Text
+          numberOfLines={1}
+          className={textClass('text-12 font-medium uppercase tracking-wider text-text-secondary')}
+        >
           Integrated Care System
         </Text>
       </View>

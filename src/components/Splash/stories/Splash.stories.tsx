@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
 import { Splash } from '../Splash';
 
 const meta = {
-    title: 'Brand Specific/Splash',
+    title: 'Brand‑Specific/Splash',
     component: Splash,
     args: {
         message: 'We’re ready to help you manage your care…',

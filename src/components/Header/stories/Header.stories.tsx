@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
 import { Header } from '../Header';
 
 const meta = {
-  title: 'Brand/Header',
+  title: 'Brand‑Specific/Header',
   component: Header,
   args: {
     userName: 'Ana Gomez',

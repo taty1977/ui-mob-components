@@ -49,8 +49,8 @@ export function SplashView({
             <Circle cx={50} cy={50} r={46} fill={HALO} />
           </Svg>
         </Animated.View>
-        {/* z-10 keeps the logo above the absolutely-positioned ring. */}
-        <View className="z-10">
+        {/* z-10 keeps the logo above the ring; the slot is wider than the halo so the stacked wordmark fits one line. */}
+        <View className="z-10 items-center" style={{ minWidth: size * 1.6 }}>
           <Logo variant="stacked" size={markSize} />
         </View>
       </View>
