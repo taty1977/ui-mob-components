@@ -57,6 +57,11 @@ src/
       index.ts
       stories/
       tests/
+    Heading/
+      Heading.tsx           # h1-h6 text with tone/weight, theme font family
+      index.ts
+      stories/
+      tests/
     Icon/
       Icon.tsx              # renderer (size, tone, a11y)
       paths.ts              # icon geometry (name -> path data)
@@ -89,6 +94,11 @@ src/
       index.ts
       stories/
       tests/
+    BodyText/
+      BodyText.tsx        # subtitle1–overline body text (MUI-style variants)
+      index.ts
+      stories/
+      tests/
   themes/                   # Figma token -> theme mapping (light/dark)
 tokens/figma/tokens.json    # exported Figma variables
 ```
@@ -96,8 +106,10 @@ tokens/figma/tokens.json    # exported Figma variables
 ## Usage
 
 ```tsx
-import { Avatar, Button, Header, Icon, Input, Logo, Menu } from 'ui-mob-components';
+import { Avatar, Button, Header, Heading, Icon, Input, Logo, Menu, BodyText } from 'ui-mob-components';
 
+<Heading variant="h2" tone="primary">Book an appointment</Heading>
+<BodyText variant="body2" tone="muted">Vitals look stable.</BodyText>
 <Avatar name="Ana" imageUrl="https://…/ana.png" status="online" />
 <Header userName="Ana" unreadCount={3} onPressMenu={() => setMenuOpen(true)} />
 <Menu open={menuOpen} onClose={() => setMenuOpen(false)} items={[{ label: 'Profile', icon: 'user' }]} />
@@ -193,20 +205,3 @@ content: [
 Configure NativeWind's Babel and Metro integrations in the consuming app as
 described in the NativeWind installation guide. `nativewind` is a peer dependency,
 so the app controls the NativeWind runtime version.
-
-### Web: browser autofill tint
-
-On the web, browsers paint a pale background over autofilled inputs and force a
-text fill color. This repo's `global.css` already neutralizes it; add the same
-snippet to your app's global stylesheet:
-
-```css
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active,
-input:autofill {
-  transition: background-color 600000s ease-in-out 0s;
-  -webkit-text-fill-color: currentColor;
-}
-```

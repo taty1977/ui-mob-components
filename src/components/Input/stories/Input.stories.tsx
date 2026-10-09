@@ -144,9 +144,8 @@ export const Tones: Story = {
           label={tone}
           tone={tone}
           focused
-          focusVisible
           filled
-          helperText="Keyboard-focus preview"
+          helperText="Focus preview"
         />
       ))}
     </Frame>

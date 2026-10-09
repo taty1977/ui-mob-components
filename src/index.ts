@@ -1,4 +1,4 @@
-export { Avatar, Button, Header, Icon, iconPaths, Input, Logo, Menu, Splash, Stepper } from './components';
+export { Avatar, BodyText, Button, Footer, Header, Heading, Icon, iconPaths, Input, Logo, Menu, Screen, Splash, Stack, Stepper } from './components';
 export type {
 	AvatarProps,
 	AvatarStatus,
@@ -6,7 +6,15 @@ export type {
 	ButtonSize,
 	ButtonTone,
 	ButtonVariant,
+	FooterProps,
+	FooterTab,
+	FooterTone,
+	FooterVariant,
 	HeaderProps,
+	HeadingProps,
+	HeadingTone,
+	HeadingVariant,
+	HeadingWeight,
 	IconName,
 	IconProps,
 	IconSize,
@@ -20,10 +28,20 @@ export type {
 	MenuItem,
 	MenuPosition,
 	MenuProps,
+	ScreenProps,
 	SplashProps,
+	StackAlign,
+	StackDirection,
+	StackGap,
+	StackJustify,
+	StackProps,
 	StepperProps,
 	StepperStep,
 	StepperTone,
+	BodyTextProps,
+	BodyTextTone,
+	BodyTextVariant,
+	BodyTextWeight,
 } from './components';
 export {
 	darkTheme,

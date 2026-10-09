@@ -192,12 +192,11 @@ describe('Input', () => {
     expect(findLabelWrapper(element)?.props.className).not.toContain('bg-background-surface');
   });
 
-  it('thickens the notch border segments on keyboard focus', () => {
+  it('thickens the notch border segments on focus', () => {
     const element = renderView({
       label: 'Email',
       variant: 'outlined',
       focused: true,
-      focusVisible: true,
       filled: true,
       notchWidth: 48,
     });
@@ -232,16 +231,15 @@ describe('Input', () => {
     const fieldClasses = String(findFieldRow(element).props.className).split(' ');
     expect(fieldClasses).toContain('border-palette-error-main');
 
-    // The error border wins even when focus arrives via keyboard on a toned field.
-    const keyboardFocus = renderView({
+    // The error border wins even on a focused, toned field.
+    const focusedTone = renderView({
       label: 'Email',
       error: true,
       tone: 'success',
       focused: true,
-      focusVisible: true,
       filled: true,
     });
-    expect(String(findFieldRow(keyboardFocus).props.className).split(' ')).toContain(
+    expect(String(findFieldRow(focusedTone).props.className).split(' ')).toContain(
       'border-palette-error-main'
     );
     expect(labelEl.props.className).toContain('text-palette-error-main');
@@ -256,26 +254,20 @@ describe('Input', () => {
     expect(findTextInput(findFieldRow(valid)).props['aria-invalid']).toBeUndefined();
   });
 
-  it('thickens the tone border on any focus and deepens it for keyboard focus', () => {
-    const pointerFocus = renderView({ label: 'Email', focused: true, focusVisible: false, filled: true });
-    const pointerClasses = String(findFieldRow(pointerFocus).props.className).split(' ');
-    expect(pointerClasses).toContain('border-palette-primary-main');
-    expect(pointerClasses).toContain('border-2');
-    expect(pointerClasses).not.toContain('border-palette-primary-dark');
+  it('thickens the tone border on focus and tints the label', () => {
+    const element = renderView({ label: 'Email', focused: true, filled: true });
+    const fieldClasses = String(findFieldRow(element).props.className).split(' ');
+    expect(fieldClasses).toContain('border-palette-primary-main');
+    expect(fieldClasses).toContain('border-2');
 
-    const keyboardFocus = renderView({ label: 'Email', focused: true, focusVisible: true, filled: true });
-    const keyboardClasses = String(findFieldRow(keyboardFocus).props.className).split(' ');
-    expect(keyboardClasses).toContain('border-palette-primary-dark');
-    expect(keyboardClasses).toContain('border-2');
-
-    const labelEl = findLabel(pointerFocus);
+    const labelEl = findLabel(element);
     expect(labelEl.props.className).toContain('text-palette-primary-main');
   });
 
-  it('deepens the selected tone on the keyboard-focus border and tints the label', () => {
-    const element = renderView({ label: 'Email', tone: 'success', focused: true, focusVisible: true, filled: true });
+  it('applies the selected tone border on focus and tints the label', () => {
+    const element = renderView({ label: 'Email', tone: 'success', focused: true, filled: true });
     const fieldClasses = String(findFieldRow(element).props.className).split(' ');
-    expect(fieldClasses).toContain('border-palette-success-dark');
+    expect(fieldClasses).toContain('border-palette-success-main');
     expect(fieldClasses).toContain('border-2');
     const labelEl = findLabel(element);
     expect(labelEl.props.className).toContain('text-palette-success-main');

@@ -1,21 +1,21 @@
 import { createElement, useEffect, type ComponentType } from 'react';
 import type { Preview } from '@storybook/react-native-web-vite';
 import { Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import '../global.css';
 
-type ThemeFrameProps = {
-	Story: ComponentType;
-	theme: 'light' | 'dark';
-	platform: 'ios' | 'android';
-};
+type Theme = 'light' | 'dark';
+type Platform = 'ios' | 'android';
 
 // Matches Variables.*.Misc.body-bg / paper in tokens/figma/tokens.json.
-const canvasColor: Record<'light' | 'dark', string> = {
+const canvasColor: Record<Theme, string> = {
 	light: '#f8f7fa',
 	dark: '#25293c',
 };
 
-const ThemeFrame = ({ Story, theme, platform }: ThemeFrameProps) => {
+// Syncs the toolbar theme onto <html> (drives the light-/dark- classes) and the
+// canvas backgrounds — with or without the phone frame.
+const ThemeSync = ({ Story, theme }: { Story: ComponentType; theme: Theme }) => {
 	useEffect(() => {
 		document.documentElement.classList.remove('light', 'dark');
 		document.documentElement.classList.add(theme);
@@ -35,7 +35,12 @@ const ThemeFrame = ({ Story, theme, platform }: ThemeFrameProps) => {
 		};
 	}, [theme]);
 
-	return createElement(
+	return createElement(Story);
+};
+
+// Phone chrome: status bar and the rounded device frame.
+const ThemeFrame = ({ Story, platform }: { Story: ComponentType; platform: Platform }) =>
+	createElement(
 		View,
 		{
 			className: 'min-h-screen bg-light-background-canvas px-4 py-6 dark:bg-dark-background-canvas',
@@ -68,7 +73,6 @@ const ThemeFrame = ({ Story, theme, platform }: ThemeFrameProps) => {
 			createElement(View, { className: 'p-5' }, createElement(Story)),
 		),
 	);
-};
 
 const preview: Preview = {
 	parameters: {
@@ -125,11 +129,19 @@ const preview: Preview = {
 		viewport: { value: 'iphone', isRotated: false },
 	},
 	decorators: [
+		// safe-area-context's SafeAreaView (used by Screen) needs a provider ancestor.
+		(Story) => createElement(SafeAreaProvider, null, createElement(Story)),
+		// Sync the toolbar theme onto <html>/body, with or without the phone frame.
+		(Story, context) =>
+			createElement(ThemeSync, {
+				Story,
+				theme: context.globals.theme === 'dark' ? 'dark' : 'light',
+			}),
+		// Phone chrome; stories opt out with parameters.layout = 'fullscreen'.
 		(Story, context) => {
-			const theme = context.globals.theme === 'dark' ? 'dark' : 'light';
+			if (context.parameters.layout === 'fullscreen') return createElement(Story);
 			const platform = context.globals.platform === 'android' ? 'android' : 'ios';
-
-			return createElement(ThemeFrame, { Story, theme, platform });
+			return createElement(ThemeFrame, { Story, platform });
 		},
 	],
 };

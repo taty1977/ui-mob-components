@@ -1,6 +1,5 @@
 import { useState, type ReactElement, type ReactNode, type Ref } from 'react';
 import { Platform, Text, TextInput, View, type LayoutChangeEvent, type TextInputProps } from 'react-native';
-import { isKeyboardModality } from '../../utils/focusModality';
 import { LabelText } from './LabelText';
 import {
   borderWidthClasses,
@@ -46,8 +45,6 @@ export type InputProps = TextInputProps & {
 
 export type InputViewProps = InputProps & {
   focused: boolean;
-  /** Keyboard (Tab) focus only; pointer/touch focus leaves this false. */
-  focusVisible?: boolean;
   filled?: boolean;
   /** Until measured, the label covers the border with a surface bg. */
   notchWidth?: number;
@@ -67,7 +64,6 @@ export function InputView({
   required = false,
   disabled = false,
   focused,
-  focusVisible = false,
   filled = false,
   notchWidth,
   onNotchLabelLayout,
@@ -90,8 +86,7 @@ export function InputView({
   // --- Colors ---
   const toneStyle = toneClasses[disabled ? 'disabled' : error ? 'error' : tone];
 
-  const borderTone =
-    error && !disabled ? toneStyle.border : focusVisible ? toneStyle.strongBorder : toneStyle.border;
+  const borderTone = toneStyle.border;
   const labelTone = disabled || error || focused ? toneStyle.text : 'text-text-secondary';
   const helperTone = disabled || error ? toneStyle.text : 'text-text-secondary';
 
@@ -276,7 +271,6 @@ export function Input({
   ...props
 }: InputProps): ReactElement {
   const [focused, setFocused] = useState(false);
-  const [focusVisible, setFocusVisible] = useState(false);
   const [notchWidth, setNotchWidth] = useState<number>();
   const [text, setText] = useState(defaultValue ?? '');
 
@@ -288,13 +282,11 @@ export function Input({
       defaultValue={defaultValue}
       value={value}
       focused={focused}
-      focusVisible={focusVisible}
       filled={filled}
       notchWidth={notchWidth}
       onNotchLabelLayout={(event) => setNotchWidth(event.nativeEvent.layout.width)}
       onBlur={(event) => {
         setFocused(false);
-        setFocusVisible(false);
         onBlur?.(event);
       }}
       onChangeText={(next) => {
@@ -303,7 +295,6 @@ export function Input({
       }}
       onFocus={(event) => {
         setFocused(true);
-        setFocusVisible(isKeyboardModality());
         onFocus?.(event);
       }}
     />

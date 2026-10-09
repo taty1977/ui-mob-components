@@ -1,0 +1,4 @@
+{
+  // The Tailwind directives in global.css are resolved by Tailwind, not the CSS language server.
+  "css.lint.unknownAtRules": "ignore"
+}

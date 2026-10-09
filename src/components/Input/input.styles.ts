@@ -7,7 +7,6 @@ export type InputTone = 'primary' | 'secondary' | 'error' | 'warning' | 'info' |
 /** Border/label classes per tone. */
 export type ToneClasses = {
   border: string;
-  strongBorder: string;
   hoverBorder: string;
   groupHoverBorder: string;
   text: string;
@@ -93,54 +92,47 @@ export const notchPieceWidthClasses: Record<
 
 // --- Tones ----------------------------------------------------------------------------
 
-// Resting borders carry the tone; hover and keyboard focus deepen it.
+// Resting borders carry the tone; hover deepens it.
 // 'disabled' is a pseudo-tone so every field state resolves through one map.
 export const toneClasses: Record<InputTone | 'disabled', ToneClasses> = {
   primary: {
     border: 'border-palette-primary-main',
-    strongBorder: 'border-palette-primary-dark',
     hoverBorder: 'hover:border-palette-primary-dark',
     groupHoverBorder: 'group-hover:border-palette-primary-dark',
     text: 'text-palette-primary-main',
   },
   secondary: {
     border: 'border-palette-secondary-main',
-    strongBorder: 'border-palette-secondary-dark',
     hoverBorder: 'hover:border-palette-secondary-dark',
     groupHoverBorder: 'group-hover:border-palette-secondary-dark',
     text: 'text-palette-secondary-main',
   },
   error: {
     border: 'border-palette-error-main',
-    strongBorder: 'border-palette-error-dark',
     hoverBorder: 'hover:border-palette-error-dark',
     groupHoverBorder: 'group-hover:border-palette-error-dark',
     text: 'text-palette-error-main',
   },
   warning: {
     border: 'border-palette-warning-main',
-    strongBorder: 'border-palette-warning-dark',
     hoverBorder: 'hover:border-palette-warning-dark',
     groupHoverBorder: 'group-hover:border-palette-warning-dark',
     text: 'text-palette-warning-main',
   },
   info: {
     border: 'border-palette-info-main',
-    strongBorder: 'border-palette-info-dark',
     hoverBorder: 'hover:border-palette-info-dark',
     groupHoverBorder: 'group-hover:border-palette-info-dark',
     text: 'text-palette-info-main',
   },
   success: {
     border: 'border-palette-success-main',
-    strongBorder: 'border-palette-success-dark',
     hoverBorder: 'hover:border-palette-success-dark',
     groupHoverBorder: 'group-hover:border-palette-success-dark',
     text: 'text-palette-success-main',
   },
   disabled: {
     border: 'border-text-disabled',
-    strongBorder: 'border-text-disabled',
     hoverBorder: '',
     groupHoverBorder: '',
     text: 'text-text-disabled',
