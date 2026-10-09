@@ -72,6 +72,10 @@ const ThemeFrame = ({ Story, theme, platform }: ThemeFrameProps) => {
 
 const preview: Preview = {
 	parameters: {
+		// Keep the All Components group at the top of the sidebar.
+		options: {
+			storySort: { order: ['All Components'] },
+		},
 		viewport: {
 			options: {
 				iphone: {

@@ -1,9 +1,12 @@
-export { Button, Icon, iconPaths, Input, Logo, Splash, Stepper } from './components';
+export { Avatar, Button, Header, Icon, iconPaths, Input, Logo, Menu, Splash, Stepper } from './components';
 export type {
+	AvatarProps,
+	AvatarStatus,
 	ButtonProps,
 	ButtonSize,
 	ButtonTone,
 	ButtonVariant,
+	HeaderProps,
 	IconName,
 	IconProps,
 	IconSize,
@@ -14,6 +17,9 @@ export type {
 	InputVariant,
 	LogoProps,
 	LogoVariant,
+	MenuItem,
+	MenuPosition,
+	MenuProps,
 	SplashProps,
 	StepperProps,
 	StepperStep,

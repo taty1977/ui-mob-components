@@ -15,7 +15,7 @@ const demoIcon = (
 ) => (show ? <Icon name={name} size={size} /> : undefined);
 
 const meta = {
-  title: 'Components/Button',
+  title: 'Inputs/Button',
   component: Button,
   args: {
     label: 'Continue',

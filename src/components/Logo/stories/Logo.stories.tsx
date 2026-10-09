@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Logo } from '../Logo';
 
 const meta = {
-  title: 'Brand‑Specific/Logo',
+  title: 'Brand Specific/Logo',
   component: Logo,
   args: {
     variant: 'horizontal',

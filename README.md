@@ -17,6 +17,7 @@ npm run storybook
 | --- | --- |
 | `npm run storybook` | Start the Storybook catalog on port 6006 |
 | `npm run build-storybook` | Build the static Storybook site |
+| `npm run chromatic` | Publish to Chromatic and run visual regression tests |
 | `npm test` | Run the Vitest unit tests once |
 | `npm run test:watch` | Run Vitest in watch mode |
 | `npm run typecheck` | Type-check `src` without emitting |
@@ -41,11 +42,21 @@ src/
   index.ts                  # public API barrel
   components/
     index.ts                # component barrel
+    Avatar/
+      Avatar.tsx            # image/initial avatar with presence dot
+      index.ts
+      stories/
+      tests/
     Button/
       Button.tsx            # component
       index.ts              # component export
       stories/              # Storybook stories
       tests/                # Vitest unit tests
+    Header/
+      Header.tsx            # app header (logo/back, greeting, avatar, bell)
+      index.ts
+      stories/
+      tests/
     Icon/
       Icon.tsx              # renderer (size, tone, a11y)
       paths.ts              # icon geometry (name -> path data)
@@ -60,6 +71,11 @@ src/
       tests/
     Logo/
       Logo.tsx              # AllInOne Health mark + wordmark
+      index.ts
+      stories/
+      tests/
+    Menu/
+      Menu.tsx              # MenuView (stateless) + Menu (trigger/controlled wrapper)
       index.ts
       stories/
       tests/
@@ -80,8 +96,11 @@ tokens/figma/tokens.json    # exported Figma variables
 ## Usage
 
 ```tsx
-import { Button, Icon, Input, Logo } from 'ui-mob-components';
+import { Avatar, Button, Header, Icon, Input, Logo, Menu } from 'ui-mob-components';
 
+<Avatar name="Ana" imageUrl="https://…/ana.png" status="online" />
+<Header userName="Ana" unreadCount={3} onPressMenu={() => setMenuOpen(true)} />
+<Menu open={menuOpen} onClose={() => setMenuOpen(false)} items={[{ label: 'Profile', icon: 'user' }]} />
 <Button label="Save" tone="primary" variant="default" />
 <Button
   label="Next"

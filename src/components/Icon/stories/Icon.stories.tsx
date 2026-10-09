@@ -18,7 +18,7 @@ const tones = [
 ] as const;
 
 const meta = {
-  title: 'Components/Icon',
+  title: 'Data Display/Icon',
   component: Icon,
   args: {
     name: 'plus',

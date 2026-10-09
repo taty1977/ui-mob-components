@@ -16,7 +16,7 @@ const demoIcon = (name: 'chevron-left' | 'chevron-right', show: unknown) =>
   show ? <Icon name={name} /> : undefined;
 
 const meta = {
-  title: 'Components/Input',
+  title: 'Inputs/Input',
   component: Input,
   args: {
     label: 'Email',

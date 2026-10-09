@@ -21,7 +21,7 @@ const demoSteps = [
 const toneSteps = [{ title: 'First' }, { title: 'Second' }, { title: 'Third' }];
 
 const meta = {
-  title: 'Components/Stepper',
+  title: 'Navigation/Stepper',
   component: Stepper,
   args: {
     steps: demoSteps,
