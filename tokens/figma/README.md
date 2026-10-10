@@ -1,12 +1,9 @@
 # Figma Tokens
 
-Place exported Figma token files here, such as JSON or YAML token exports.
+`tokens.json` is the single Figma export and source of truth for the design
+tokens. It holds `Variables` and `Primitives`, each keyed by theme mode
+(`Light`, `Dark`, ...).
 
-Suggested naming:
-
-- `colors.json`
-- `spacing.json`
-- `typography.json`
-- `theme.json`
-
-Keep this folder focused on raw token data, then map them into the app theme in `src/themes/`.
+`npm run generate-tokens` bakes it into `src/themes/generatedTokens.ts`
+(validated; fails on broken references). See `../README.md` for how to add a
+theme.

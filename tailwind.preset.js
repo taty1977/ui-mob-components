@@ -1,6 +1,7 @@
-// Consumer-facing Tailwind preset: the Figma-token theme (colors, spacing,
-// radii, typography scales) plus the light/dark CSS variables that
-// ui-mob-components classes resolve against. Usage in the consuming app:
+// Consumer-facing Tailwind preset: Figma-token theme (colors, spacing, radii,
+// typography) plus per-theme CSS variables. Every Figma mode becomes a
+// .<theme> class and a bg-<theme>-*/text-<theme>-* utility group.
+// Usage in the consuming app:
 //
 //   // tailwind.config.js
 //   module.exports = {
@@ -16,8 +17,9 @@ try {
   // Repo development: prefer the source tokens (fresh, no build needed).
   figmaTokens = require('./tokens/figma/tokens.json');
 } catch {
-  // Published package: only the built copy under lib/ is shipped.
-  figmaTokens = require('./lib/tokens/figma/tokens.json');
+  // Published package: tokens are baked into the compiled library output,
+  // so no separate tokens file needs to be resolved or installed.
+  figmaTokens = require('./lib/commonjs/themes/generatedTokens.js').default;
 }
 
 const {
@@ -25,22 +27,34 @@ const {
   dimensions,
   scaleUtilities,
   themeColors,
+  themeKey,
   variablesForMode,
 } = require('./utils/tailwindTokenUtils.cjs');
 
-const lightModeVariables = variablesForMode(figmaTokens, 'Light');
-const darkModeVariables = variablesForMode(figmaTokens, 'Dark');
+// Modes come from the Figma export; new ones are wired up automatically.
+const themeModes = Object.keys(figmaTokens.Variables);
+const defaultMode = themeModes.includes('Light') ? 'Light' : themeModes[0];
+const darkMode = themeModes.includes('Dark') ? 'Dark' : undefined;
 
-// Emit per-theme CSS vars: explicit .light/.dark class wins, otherwise fall
-// back to the system color scheme (unless .light is forced).
+const perMode = (fn) =>
+  Object.fromEntries(themeModes.map((mode) => [themeKey(mode), fn(figmaTokens, mode)]));
+
+const variablesByMode = perMode(variablesForMode);
+
+// .<theme> class wins; system dark mode applies unless the default is forced.
 const themeVariablesPlugin = ({ addBase }) => {
   addBase({
-    ':root': lightModeVariables,
-    '@media (prefers-color-scheme: dark)': {
-      ':root:not(.light)': darkModeVariables,
-    },
-    '.light': lightModeVariables,
-    '.dark': darkModeVariables,
+    ':root': variablesByMode[themeKey(defaultMode)],
+    ...(darkMode
+      ? {
+          '@media (prefers-color-scheme: dark)': {
+            [`:root:not(.${themeKey(defaultMode)})`]: variablesByMode[themeKey(darkMode)],
+          },
+        }
+      : {}),
+    ...Object.fromEntries(
+      Object.entries(variablesByMode).map(([key, variables]) => [`.${key}`, variables]),
+    ),
   });
 };
 
@@ -55,9 +69,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Static hex per theme: bg-light-*/bg-dark-* classes.
-        light: themeColors(figmaTokens, 'Light'),
-        dark: themeColors(figmaTokens, 'Dark'),
+        // Static hex per theme: bg-<theme>-* classes.
+        ...perMode(themeColors),
         // Unprefixed classes (text-palette-primary-main) follow the active theme.
         ...adaptiveColors(figmaTokens),
       },

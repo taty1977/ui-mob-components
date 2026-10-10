@@ -1,4 +1,4 @@
-import figmaTokens from '../../tokens/figma/tokens.json';
+import figmaTokens, { themeKeys } from './generatedTokens';
 
 export type FigmaThemeMode = keyof typeof figmaTokens.Variables;
 
@@ -216,16 +216,21 @@ export const lightTheme = { color: lightModeTokens.color } as const;
 /** Semantic colors for the dark theme. */
 export const darkTheme = { color: darkModeTokens.color } as const;
 
+export type ThemeMode = (typeof themeKeys)[FigmaThemeMode];
+
+// Resolved tokens per mode; new Figma modes appear after generate-tokens.
+const themes = Object.fromEntries(
+    (Object.keys(figmaTokens.Variables) as FigmaThemeMode[]).map((mode) => [
+        themeKeys[mode],
+        createThemeTokens(mode),
+    ]),
+) as Record<ThemeMode, ReturnType<typeof createThemeTokens>>;
+
 /** All resolved tokens; `core`/`semantic` default to light. */
 export const themeTokens = {
     core: lightModeTokens.core,
     semantic: lightModeTokens.semantic,
-    themes: {
-        light: lightModeTokens,
-        dark: darkModeTokens,
-    },
+    themes,
 } as const;
 
-export type ThemeMode = keyof typeof themeTokens.themes;
-
-export const getThemeTokens = (mode: ThemeMode) => themeTokens.themes[mode];
+export const getThemeTokens = (mode: ThemeMode) => themes[mode];

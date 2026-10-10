@@ -12,6 +12,7 @@ module.exports = tseslint.config(
       'node_modules/**',
       'run/**',
       '.husky/**',
+      'src/themes/generatedTokens.ts',
     ],
   },
   js.configs.recommended,

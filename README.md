@@ -22,7 +22,10 @@ npm run storybook
 | `npm run test:watch` | Run Vitest in watch mode |
 | `npm run typecheck` | Type-check `src` without emitting |
 | `npm run lint` | ESLint (TypeScript + React rules) |
-| `npm run build` | Build `lib/` (CJS, ESM, types) and copy tokens |
+| `npm run build` | Generate tokens and build `lib/` (CJS, ESM, types) |
+| `npm run generate-tokens` | Regenerate `src/themes/generatedTokens.ts` from the Figma export |
+| `npm run check-tokens` | Fail if the generated token module is stale (CI) |
+| `npm run release` | Publish to npm via Changesets |
 
 ### Commit hooks
 
@@ -99,8 +102,8 @@ src/
       index.ts
       stories/
       tests/
-  themes/                   # Figma token -> theme mapping (light/dark)
-tokens/figma/tokens.json    # exported Figma variables
+  themes/                   # generatedTokens.ts (baked tokens) + theme mapping (multi-mode)
+tokens/figma/tokens.json    # exported Figma variables (source of truth)
 ```
 
 ## Usage
@@ -216,7 +219,8 @@ content: [
 ```
 
 Configure NativeWind's Babel and Metro integrations in the consuming app as
-described in the NativeWind installation guide. `nativewind` is a peer dependency,
-so the app controls the NativeWind runtime version. Wrap the app root in
+described in the NativeWind installation guide. `nativewind`, `react-native-svg`
+and `react-native-safe-area-context` are peer dependencies — install them in the
+app so it controls their versions. Wrap the app root in
 `SafeAreaProvider` (react-native-safe-area-context) for `Screen` insets, and load
 the theme font — `fontFamily.sans` resolves to `var(--font-family)`.

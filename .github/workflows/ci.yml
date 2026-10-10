@@ -1,0 +1,25 @@
+name: CI
+
+# Quality gates on every push to main and every PR.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check-tokens
+      - run: npm run typecheck
+      - run: npm run lint
+      # Storybook tests run in headless Chromium.
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - run: npm run build

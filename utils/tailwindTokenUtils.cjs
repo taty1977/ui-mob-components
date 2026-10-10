@@ -1,5 +1,8 @@
 // --- Shared helpers ---------------------------------------------------------
 
+// Figma mode name -> theme key / CSS class ('Brand A' -> 'brand-a').
+const themeKey = (mode) => mode.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
 // Flatten { name: { $value } } token groups to name -> value, dropping $type.
 const tokenValues = (tokens) =>
   Object.fromEntries(
@@ -99,9 +102,10 @@ const colorVariablesForMode = (figmaTokens, mode) => {
   return flatten(themeColors(figmaTokens, mode), [], {});
 };
 
-// Same color tree but with var(--...) values, so unprefixed classes
-// (text-palette-primary-main) follow the active .light/.dark theme.
+// Same tree with var(--...) values so unprefixed classes follow the active theme.
 const adaptiveColors = (figmaTokens) => {
+  const modes = Object.keys(figmaTokens.Variables);
+  const defaultMode = modes.includes('Light') ? 'Light' : modes[0];
   const build = (obj, path) =>
     Object.fromEntries(
       Object.entries(obj).map(([key, value]) => [
@@ -111,7 +115,7 @@ const adaptiveColors = (figmaTokens) => {
           : build(value, [...path, key]),
       ]),
     );
-  return build(themeColors(figmaTokens, 'Light'), []);
+  return build(themeColors(figmaTokens, defaultMode), []);
 };
 
 // --- Dimensions (spacing, radius) -------------------------------------------
@@ -209,5 +213,6 @@ module.exports = {
   dimensions,
   scaleUtilities,
   themeColors,
+  themeKey,
   variablesForMode,
 };
