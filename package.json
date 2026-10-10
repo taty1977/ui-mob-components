@@ -9,7 +9,9 @@
   "types": "lib/typescript/src/index.d.ts",
   "files": [
     "lib",
-    "src"
+    "src",
+    "utils",
+    "tailwind.preset.js"
   ],
   "sideEffects": false,
   "scripts": {

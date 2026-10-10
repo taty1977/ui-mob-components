@@ -192,8 +192,21 @@ preview between the light and dark token sets.
 ## Consumer setup
 
 Install this package together with React Native, NativeWind 4, Tailwind CSS 3, and
-react-native-svg. Add the package build output to the consumer's Tailwind content
-paths so NativeWind can discover the component classes:
+react-native-svg. Then apply the shipped Tailwind preset — it bundles the
+NativeWind preset, the Figma-token theme (colors, spacing, radii, typography
+scales), the light/dark CSS variables, and a content glob covering the package
+build output:
+
+```js
+// tailwind.config.js (consuming app)
+module.exports = {
+  presets: [require('ui-mob-components/tailwind.preset')],
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+};
+```
+
+If your package manager hoists the library elsewhere (e.g. a monorepo root), add
+the glob yourself so NativeWind can discover the component classes:
 
 ```js
 content: [
@@ -204,4 +217,6 @@ content: [
 
 Configure NativeWind's Babel and Metro integrations in the consuming app as
 described in the NativeWind installation guide. `nativewind` is a peer dependency,
-so the app controls the NativeWind runtime version.
+so the app controls the NativeWind runtime version. Wrap the app root in
+`SafeAreaProvider` (react-native-safe-area-context) for `Screen` insets, and load
+the theme font — `fontFamily.sans` resolves to `var(--font-family)`.
