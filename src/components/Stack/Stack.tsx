@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
-import { View } from 'react-native';
+import { View, type StyleProp, type ViewStyle } from 'react-native';
 
 // --- Types -----------------------------------------------------------------------
 
@@ -30,6 +30,8 @@ export type StackProps = {
   flex?: boolean;
   children?: ReactNode;
   className?: string;
+  /** Style passthrough — e.g. NativeWind vars() theme objects, which can't ride className. */
+  style?: StyleProp<ViewStyle>;
 };
 
 // --- Style maps ---------------------------------------------------------------------
@@ -77,9 +79,11 @@ export function Stack({
   flex = false,
   children,
   className,
+  style,
 }: StackProps): ReactElement {
   return (
     <View
+      style={style}
       // Prop-driven classes first, consumer className last so it wins conflicts.
       className={[
         direction === 'row' ? 'flex-row' : undefined,

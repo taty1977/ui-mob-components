@@ -35,4 +35,9 @@ describe('Stack', () => {
     const el = renderStack({ gap: 2, className: 'mt-4' });
     expect(el.props.className).toBe('gap-2 mt-4');
   });
+
+  it('passes style through to the root view', () => {
+    const style = { marginTop: 8 } as const;
+    expect(renderStack({ style }).props.style).toBe(style);
+  });
 });
