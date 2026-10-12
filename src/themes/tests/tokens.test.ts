@@ -41,6 +41,19 @@ describe('token pipeline', () => {
         }
     });
 
+    it('exposes divider, overlay and action state tokens for every mode', () => {
+        for (const mode of modes) {
+            const { color } = getThemeTokens(themeKeys[mode]).semantic;
+            expect(color.divider).toEqual(expect.any(String));
+            expect(color.chipBackground).toEqual(expect.any(String));
+            expect(color.filledInputBg).toEqual(expect.any(String));
+            expect(color.backdropOverlay).toEqual(expect.any(String));
+            expect(color.misc.bgBlack).toEqual(expect.any(String));
+            expect(color.action.focus).toEqual(expect.any(String));
+            expect(color.action.disabledContent).toEqual(expect.any(String));
+        }
+    });
+
     it('generates Tailwind color groups and CSS variables for every mode', () => {
         const preset = nodeRequire('../../../tailwind.preset.js');
         const { themeKey, variablesForMode } = nodeRequire('../../../utils/tailwindTokenUtils.cjs');

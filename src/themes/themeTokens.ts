@@ -169,11 +169,20 @@ export function mapTokensToTheme(
                     strong: variables.Theme['input-border'].$value,
                     focus: primitives.Color.Primary['primary-500'].$value,
                 },
+                divider: variables.Theme['divider'].$value,
+                chipBackground: variables.Theme['chip-background'].$value,
+                filledInputBg: variables.Theme['filled-input-bg'].$value,
+                backdropOverlay: variables.Theme['backdrop-overlay'].$value,
                 action: {
                     active: variables.Theme['action-active'].$value,
                     hover: variables.Theme['action-hover'].$value,
                     selected: variables.Theme['action-selected'].$value,
+                    focus: variables.Theme['action-focus'].$value,
                     disabled: variables.Theme['action-disabled-bg'].$value,
+                    disabledContent: variables.Theme['action-disabled'].$value,
+                },
+                misc: {
+                    bgBlack: variables.Misc['bg-black'].$value,
                 },
             },
             space: {
