@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -14,8 +13,8 @@ import {
 // createRequire keeps these files out of tsc/bob's declaration build.
 const nodeRequire = createRequire(import.meta.url);
 
-const sourceTokens = JSON.parse(
-    readFileSync(path.join(process.cwd(), 'tokens/figma/tokens.json'), 'utf8').replace(/^\uFEFF/, ''),
+const sourceTokens = nodeRequire('../../../utils/loadFigmaTokens.cjs').loadFigmaTokens(
+    path.join(process.cwd(), 'tokens/figma'),
 ) as typeof figmaTokens;
 
 const modes = Object.keys(sourceTokens.Variables) as FigmaThemeMode[];

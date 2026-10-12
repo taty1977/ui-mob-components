@@ -93,7 +93,7 @@ export const VariantMatrix: Story = {
     <View className="gap-5">
       {tones.map((tone) => (
         <View key={tone} className="gap-2">
-          <Text className="text-13 font-semibold capitalize text-light-text-secondary dark:text-dark-text-secondary">
+          <Text className="text-13 font-semibold capitalize text-text-secondary">
             {tone}
           </Text>
           <View className="flex-row flex-wrap items-center gap-2">
@@ -123,7 +123,7 @@ export const WithIcons: Story = {
         iconRight={demoIcon('chevron-right', iconRight, size)}
       />
       <View className="gap-2">
-        <Text className="text-13 font-semibold text-light-text-secondary">
+        <Text className="text-13 font-semibold text-text-secondary">
           All tones and variants
         </Text>
         {tones.map((tone) => (

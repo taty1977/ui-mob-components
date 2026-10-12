@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+import { a11yProps } from '../../utils/a11yProps';
 
 // --- Types -----------------------------------------------------------------------
 
@@ -25,11 +26,7 @@ export type AvatarProps = {
 // --- Style constants -------------------------------------------------------------
 
 // Hidden from AT — visible text inside a labeled control trips label-content-name-mismatch.
-const DECORATIVE = {
-  'aria-hidden': true,
-  accessibilityElementsHidden: true,
-  importantForAccessibility: 'no-hide-descendants',
-} as const;
+const DECORATIVE = a11yProps(true);
 
 // px per size token; the dot and initial scale from it.
 const SIZE_PX: Record<AvatarSize, number> = { sm: 32, md: 42, lg: 56, xl: 72, xxl: 96 };

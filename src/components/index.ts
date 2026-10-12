@@ -14,6 +14,8 @@ export type {
   ButtonTone,
   ButtonVariant,
 } from './Button';
+export { Drawer } from './Drawer';
+export type { DrawerProps, DrawerSide } from './Drawer';
 export { Footer } from './Footer';
 export type { FooterProps, FooterTab, FooterTone, FooterVariant } from './Footer';
 export { Header } from './Header';

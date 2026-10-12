@@ -34,10 +34,6 @@ const byText = (root: ReactNode, text: unknown) =>
   findAll(root, (el) => el.props.children === text);
 const byLabel = (root: ReactNode, label: string) =>
   findAll(root, (el) => el.props.accessibilityLabel === label);
-const kidsOf = (el: AnyElement) => {
-  const children = el.props.children as ReactNode;
-  return (Array.isArray(children) ? children : [children]).filter(Boolean) as AnyElement[];
-};
 
 describe('Header', () => {
   // --- Title area ------------------------------------------------------------------
@@ -73,27 +69,21 @@ describe('Header', () => {
     expect(findAll(noLogo, (el) => el.type === Avatar)).toHaveLength(1);
   });
 
-  it('moves the avatar to the right of the title when the logo shows', () => {
-    const header = renderHeader();
-    const row = byClass(header, 'flex-row items-center gap-3')[0];
-    const kids = kidsOf(row);
-    const logoIndex = kids.findIndex((el) => el.type === Logo);
-    const avatarIndex = kids.findIndex((el) => el.type === Avatar);
-    expect(logoIndex).toBeGreaterThanOrEqual(0);
-    expect(avatarIndex).toBeGreaterThan(logoIndex);
+  it('hides the avatar while the logo shows', () => {
+    expect(findAll(renderHeader(), (el) => el.type === Avatar)).toHaveLength(0);
   });
 
   // --- Avatar ------------------------------------------------------------------------
 
   it('passes the user name and image down to the avatar', () => {
-    const avatar = findAll(renderHeader({ userAvatarUrl: 'x.png' }), (el) => el.type === Avatar)[0];
+    const avatar = findAll(renderHeader({ showLogo: false, userAvatarUrl: 'x.png' }), (el) => el.type === Avatar)[0];
     expect(avatar.props.name).toBe('Ana');
     expect(avatar.props.imageUrl).toBe('x.png');
   });
 
   it('maps the status flags to the avatar status', () => {
     const statusOf = (props: HeaderProps) =>
-      findAll(renderHeader(props), (el) => el.type === Avatar)[0].props.status;
+      findAll(renderHeader({ showLogo: false, ...props }), (el) => el.type === Avatar)[0].props.status;
     expect(statusOf({ statusOnline: true })).toBe('online');
     expect(statusOf({ statusOnline: false })).toBe('offline');
     expect(statusOf({ showStatusIndicator: false })).toBeUndefined();
@@ -103,12 +93,13 @@ describe('Header', () => {
 
   it('caps the unread badge at 99+ and hides it at zero', () => {
     expect(byText(renderHeader({ unreadCount: 120 }), '99+')).toHaveLength(1);
-    expect(byText(renderHeader({ unreadCount: 3 }), 3)).toHaveLength(1);
-    expect(byClass(renderHeader({ unreadCount: 0 }), 'bg-palette-error-main')).toHaveLength(0);
+    expect(byText(renderHeader({ unreadCount: 3 }), '3')).toHaveLength(1);
+    expect(byClass(renderHeader({ unreadCount: 0 }), 'bg-error-800')).toHaveLength(0);
   });
 
   it('labels the bell with the unread count', () => {
     expect(byLabel(renderHeader({ unreadCount: 3 }), 'Notifications, 3 unread')).toHaveLength(1);
+    expect(byLabel(renderHeader({ unreadCount: 120 }), 'Notifications, 99+ unread')).toHaveLength(1);
     expect(byLabel(renderHeader(), 'Notifications')).toHaveLength(1);
   });
 
@@ -122,8 +113,7 @@ describe('Header', () => {
 
     (byLabel(header, 'Go back')[0].props.onPress as () => void)();
     (byLabel(header, 'Notifications')[0].props.onPress as () => void)();
-    // Back mode hides the avatar, so profile comes from the default layout.
-    const avatar = findAll(renderHeader({ onPressProfile }), (el) => el.type === Avatar)[0];
+    const avatar = findAll(renderHeader({ showLogo: false, onPressProfile }), (el) => el.type === Avatar)[0];
     (avatar.props.onPress as () => void)();
 
     expect(onPressBack).toHaveBeenCalledTimes(1);
@@ -131,13 +121,13 @@ describe('Header', () => {
     expect(onPressProfile).toHaveBeenCalledTimes(1);
   });
 
-  it('shows a burger button that forwards onPressMenu when set', () => {
-    const onPressMenu = vi.fn();
-    expect(byLabel(renderHeader(), 'Open menu')).toHaveLength(0);
+  it('shows a search button that forwards onPressSearch when set', () => {
+    const onPressSearch = vi.fn();
+    expect(byLabel(renderHeader(), 'Search')).toHaveLength(0);
 
-    const header = renderHeader({ onPressMenu });
-    (byLabel(header, 'Open menu')[0].props.onPress as () => void)();
-    expect(onPressMenu).toHaveBeenCalledTimes(1);
+    const header = renderHeader({ onPressSearch });
+    (byLabel(header, 'Search')[0].props.onPress as () => void)();
+    expect(onPressSearch).toHaveBeenCalledTimes(1);
   });
 
   it('adds the top inset to the container padding', () => {

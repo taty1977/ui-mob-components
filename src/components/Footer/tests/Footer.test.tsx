@@ -7,14 +7,14 @@ vi.mock('react-native-svg', () => {
   return { default: stub('Svg'), Path: stub('Path'), Circle: stub('Circle') };
 });
 
-import { Footer } from '../Footer';
+import { FooterView } from '../Footer';
 import type { FooterProps, FooterTab } from '../Footer';
 import { BodyText } from '../../BodyText';
 
 type AnyElement = ReactElement & { props: Record<string, unknown> };
 
 const renderFooter = (props: FooterProps = {}) =>
-  Footer(props) as unknown as AnyElement;
+  FooterView(props) as unknown as AnyElement;
 
 // --- Element-tree helpers ----------------------------------------------------------
 

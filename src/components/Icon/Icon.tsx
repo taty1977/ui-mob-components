@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 import Svg, { Path, type SvgProps } from 'react-native-svg';
+import { a11yProps } from '../../utils/a11yProps';
 import { iconPaths, type IconName } from './paths';
 
 export type IconSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
@@ -68,11 +69,7 @@ export function Icon({
       viewBox="0 0 24 24"
       fill="currentColor"
       className={classes || undefined}
-      accessible={!decorative}
-      accessibilityElementsHidden={decorative}
-      importantForAccessibility={decorative ? 'no-hide-descendants' : 'auto'}
-      accessibilityLabel={accessibilityLabel}
-      accessibilityRole={decorative ? 'none' : 'image'}
+      {...a11yProps(decorative, accessibilityLabel)}
     >
       {children ?? <Path d={iconPaths[name]} />}
     </Svg>

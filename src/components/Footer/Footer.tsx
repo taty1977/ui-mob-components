@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { BodyText } from '../BodyText';
@@ -6,8 +6,6 @@ import type { ButtonTone } from '../Button';
 import { Icon } from '../Icon';
 import type { IconName } from '../Icon';
 import type { TextTone } from '../../utils/text.styles';
-
-// --- Types -----------------------------------------------------------------------
 
 /** meta = centered text block; tabs = bottom navigation bar. */
 export type FooterVariant = 'meta' | 'tabs';
@@ -36,8 +34,10 @@ export type FooterProps = {
   tabs?: FooterTab[];
   /** Active tab color, like Button tones. */
   activeTone?: ButtonTone;
-  /** Label of the active tab. */
+  /** Label of the active tab; omit to manage internally. */
   activeTab?: string;
+  /** Initial active tab when uncontrolled. */
+  defaultTab?: string;
   /** Called with the pressed tab's label. */
   onTabPress?: (label: string) => void;
   // Meta variant
@@ -51,15 +51,15 @@ export type FooterProps = {
   version?: string;
 };
 
-// --- Component ---------------------------------------------------------------------
-
-// Shared bar frame; the variants differ only in inner padding.
 const BAR_CLASSES = 'bg-background-canvas border-t border-border-subtle px-3';
 
-/** Compact app footer: by default (tabs) a bottom navigation bar (pass tabs);
- * variant="meta" renders a centered block with optional help, terms/privacy,
- * copyright, and version lines. All colors come from the adaptive theme classes. */
-export function Footer({
+export type FooterViewProps = FooterProps & {
+  /** Resolved active tab label (defaults to activeTab). */
+  currentTab?: string;
+};
+
+/** Stateless footer; exported so unit tests can drive it without hooks. */
+export function FooterView({
   variant = 'tabs',
   tone = 'muted',
   bottomInset = 0,
@@ -67,18 +67,19 @@ export function Footer({
   tabs,
   activeTone = 'primary',
   activeTab,
+  currentTab,
   onTabPress,
   needHelp,
   termsLine,
   copyright,
   version,
-}: FooterProps): ReactElement {
-  // variant="tabs": bottom navigation bar.
+}: FooterViewProps): ReactElement {
+  const current = currentTab ?? activeTab;
+
   if (variant === 'tabs') {
-    // Never trust external input (e.g. Storybook's object control can hand back a
-    // non-array): anything that isn't an array renders no tabs.
+    // Storybook's object control can hand back a non-array; only arrays render tabs.
     const tabList = Array.isArray(tabs) ? tabs : [];
-    // IconTone has no 'default'; muted is the inactive icon color in that case.
+    // IconTone has no 'default'; muted covers it.
     const inactiveIconTone = tone === 'default' ? 'muted' : tone;
 
     return (
@@ -88,7 +89,7 @@ export function Footer({
       >
         <View className="flex-row" accessibilityRole="tablist">
           {tabList.map((tab) => {
-            const active = tab.label === activeTab;
+            const active = tab.label === current;
             return (
               <Pressable
                 key={tab.label}
@@ -118,7 +119,6 @@ export function Footer({
     );
   }
 
-  // variant="meta": centered help/terms/copyright/version lines.
   const year = new Date().getFullYear();
 
   return (
@@ -147,5 +147,21 @@ export function Footer({
         ) : null}
       </View>
     </View>
+  );
+}
+
+/** Compact app footer: tabs bar (default) or centered meta block. Manages the
+ * active tab when activeTab is unset. */
+export function Footer(props: FooterProps): ReactElement {
+  const [internalTab, setInternalTab] = useState(props.defaultTab);
+  return (
+    <FooterView
+      {...props}
+      currentTab={props.activeTab ?? internalTab}
+      onTabPress={(label) => {
+        setInternalTab(label);
+        props.onTabPress?.(label);
+      }}
+    />
   );
 }

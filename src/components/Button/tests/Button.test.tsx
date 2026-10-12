@@ -50,10 +50,10 @@ describe('Button', () => {
 
   it('applies the variant text color to the icon row so icons inherit it', () => {
     const outline = renderButton({ label: 'Continue', tone: 'error', variant: 'outline', iconLeft: '←' });
-    expect(outline.props.children.props.className).toContain('text-light-palette-error-main');
+    expect(outline.props.children.props.className).toContain('text-palette-error-main');
 
     const solid = renderButton({ label: 'Continue', tone: 'primary', iconLeft: '←' });
-    expect(solid.props.children.props.className).toContain('text-light-misc-bg-white');
+    expect(solid.props.children.props.className).toContain('text-misc-bg-white');
   });
 
   it('accepts every tone and variant combination', () => {

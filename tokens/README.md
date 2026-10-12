@@ -13,7 +13,7 @@ Keep raw token exports separate from application code so the tokens can be regen
 
 Modes (themes) are data, not code. To add one:
 
-1. Export the new mode from Figma into `tokens/figma/tokens.json`. It must appear under both `Variables` and `Primitives` with the standard groups (`Theme`/`Misc`/`Color-Palette` and `Color`/`Gap`/`Border-Radius`/`Typography`).
+1. Add the new mode as `tokens/figma/<Mode>.json` (Figma export or hand-authored), holding that mode's `Variables` and `Primitives` with the standard groups (`Theme`/`Misc`/`Color-Palette` and `Color`/`Gap`/`Border-Radius`/`Typography`).
 2. Run `npm run generate-tokens` (part of `npm run build`). The generator validates the structure and every `{...}` token reference, failing the build on a broken export.
 3. The new theme is then automatically available as:
    - `themeTokens.themes.<theme>` / `getThemeTokens('<theme>')` at runtime

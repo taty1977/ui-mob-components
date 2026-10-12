@@ -84,6 +84,6 @@
   },
   "lint-staged": {
     "*.{js,cjs,ts,tsx}": "eslint --fix",
-    "tokens/figma/tokens.json": "node scripts/generate-tokens.js"
+    "tokens/figma/*.json": "node scripts/generate-tokens.js"
   }
 }

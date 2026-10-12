@@ -72,7 +72,7 @@ export const Gallery: Story = {
       {names.map((name) => (
         <View key={name} className="items-center gap-1">
           <Icon name={name} size={args.size} tone={args.tone} />
-          <Text className="text-13 text-light-text-secondary">{name}</Text>
+          <Text className="text-13 text-text-secondary">{name}</Text>
         </View>
       ))}
     </View>
@@ -85,7 +85,7 @@ export const Tones: Story = {
       {tones.map((tone) => (
         <View key={tone} className="flex-row items-center gap-2">
           <Icon name={args.name} size={args.size} tone={tone} />
-          <Text className="text-13 capitalize text-light-text-secondary">{tone}</Text>
+          <Text className="text-13 capitalize text-text-secondary">{tone}</Text>
         </View>
       ))}
     </View>

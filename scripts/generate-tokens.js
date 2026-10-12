@@ -1,21 +1,15 @@
-// Generates src/themes/generatedTokens.ts from the Figma export so the
-// published package embeds tokens as plain JS.
-// Usage: node scripts/generate-tokens.js [--check]  (--check fails if stale, for CI)
 const fs = require('node:fs');
 const path = require('node:path');
 
+const { loadFigmaTokens } = require('../utils/loadFigmaTokens.cjs');
 const { themeKey } = require('../utils/tailwindTokenUtils.cjs');
 
-const source = path.resolve(__dirname, '../tokens/figma/tokens.json');
+const sourceDir = path.resolve(__dirname, '../tokens/figma');
 const destination = path.resolve(__dirname, '../src/themes/generatedTokens.ts');
 
-// --- Validation ---------------------------------------------------------------
-
-// Token groups every mode must provide.
 const REQUIRED_VARIABLE_GROUPS = ['Theme', 'Misc', 'Color-Palette'];
 const REQUIRED_PRIMITIVE_GROUPS = ['Color', 'Gap', 'Border-Radius', 'Typography'];
 
-// Fail the build on unresolvable "{A.B.C}" references.
 const collectReferenceErrors = (tokens, errors) => {
   const visit = (node, trail) => {
     if (!node || typeof node !== 'object') return;
@@ -84,33 +78,26 @@ const validate = (tokens) => {
   return errors;
 };
 
-// --- Generation -----------------------------------------------------------------
-
-// Strip the BOM — JSON.parse rejects it.
-const raw = fs.readFileSync(source, 'utf8').replace(/^\uFEFF/, '');
-
 let tokens;
 try {
-  tokens = JSON.parse(raw);
+  tokens = loadFigmaTokens(sourceDir);
 } catch (error) {
-  console.error(`tokens/figma/tokens.json is not valid JSON: ${error.message}`);
+  console.error(error.message);
   process.exit(1);
 }
 
 const errors = validate(tokens);
 if (errors.length > 0) {
-  console.error('Invalid tokens/figma/tokens.json:');
+  console.error('Invalid tokens in tokens/figma/:');
   for (const error of errors) console.error(`  - ${error}`);
   process.exit(1);
 }
 
-// JSON is a valid JS literal; pretty-print for reviewable diffs. themeKeys is
-// baked in so src/ code never re-implements the mode -> theme-key mapping.
 const themeKeys = Object.fromEntries(
   Object.keys(tokens.Variables).map((mode) => [mode, themeKey(mode)]),
 );
 
-const output = `// AUTO-GENERATED from tokens/figma/tokens.json — do not edit; run "npm run generate-tokens".
+const output = `// AUTO-GENERATED from tokens/figma/*.json — do not edit; run "npm run generate-tokens".
 const figmaTokens = ${JSON.stringify(tokens, null, 2)};
 
 export const themeKeys = ${JSON.stringify(themeKeys)} as const;

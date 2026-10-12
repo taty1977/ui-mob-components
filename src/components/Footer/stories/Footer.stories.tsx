@@ -1,17 +1,38 @@
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
+import { fn } from 'storybook/test';
+import { Text, View } from 'react-native';
 import { Footer } from '../Footer';
-import type { FooterTab } from '../Footer';
+import type { FooterProps, FooterTab } from '../Footer';
+import { Drawer } from '../../Drawer';
+import { Icon, type IconName } from '../../Icon';
 
 // --- Fixtures --------------------------------------------------------------------
 
 // App sections for the bottom-nav stories.
 const APP_TABS: FooterTab[] = [
-  { label: 'Today', icon: 'house' },
+  { label: 'Dashboard', icon: 'house' },
+  { label: 'Doctors', icon: 'doctor' },
   { label: 'Labs', icon: 'lab' },
-  { label: 'Doctor', icon: 'doctor' },
-  { label: 'Messages', icon: 'bell' },
-  { label: 'Me', icon: 'user' },
+  { label: 'Menu', icon: 'menu' },
 ];
+
+const drawerDestinations: { label: string; icon: IconName }[] = [
+  { label: 'Profile', icon: 'user' },
+  { label: 'Documents', icon: 'document' },
+  { label: 'Log out', icon: 'close' },
+];
+
+const drawerContent = (
+  <View className="gap-1 py-2">
+    {drawerDestinations.map((item) => (
+      <View key={item.label} className="flex-row items-center gap-3 px-4 py-3">
+        <Icon name={item.icon} size="md" tone="primary" />
+        <Text className="text-15 text-text-primary">{item.label}</Text>
+      </View>
+    ))}
+  </View>
+);
 
 // --- Meta ------------------------------------------------------------------------
 
@@ -24,7 +45,8 @@ const meta = {
     version: 'v2.4.0 (Build 89201)',
     // The default variant is tabs; these populate the Playground's tab bar.
     tabs: APP_TABS,
-    activeTab: 'Today',
+    defaultTab: 'Dashboard',
+    onTabPress: fn(),
   },
   argTypes: {
     // Content
@@ -75,14 +97,19 @@ const meta = {
     // State
     activeTab: {
       control: 'text',
-      description: 'Label of the active tab (variant="tabs")',
+      description: 'Label of the active tab; omit to manage internally (variant="tabs")',
       table: { category: 'State' },
     },
-    // Advanced
+    defaultTab: {
+      control: 'text',
+      description: 'Initial active tab when uncontrolled (variant="tabs")',
+      table: { category: 'State' },
+    },
+    // Actions
     onTabPress: {
       control: false,
       description: 'Called with the pressed tab label (variant="tabs")',
-      table: { category: 'Advanced' },
+      table: { category: 'Actions' },
     },
     bottomInset: {
       control: 'number',
@@ -98,7 +125,34 @@ type Story = StoryObj<typeof meta>;
 
 // --- Stories --------------------------------------------------------------------
 
-export const Playground: Story = {};
+// The Menu tab opens the drawer; other tabs switch normally.
+function FooterWithDrawer(args: FooterProps) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  return (
+    <>
+      <Footer
+        {...args}
+        onTabPress={(label) => {
+          args.onTabPress?.(label);
+          if (label === 'Menu') setDrawerOpen(true);
+        }}
+      />
+      <Drawer open={drawerOpen} side="right" onClose={() => setDrawerOpen(false)}>
+        {drawerContent}
+      </Drawer>
+    </>
+  );
+}
+
+export const Playground: Story = {
+  // Full canvas: the drawer overlay must cover the tab bar and frame chrome.
+  parameters: { layout: 'fullscreen' },
+  render: (args) => (
+    <View className="min-h-screen justify-end">
+      <FooterWithDrawer {...args} />
+    </View>
+  ),
+};
 
 // Bottom navigation bar with the five app sections.
 export const BottomNav: Story = {

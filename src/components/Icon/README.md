@@ -4,7 +4,7 @@ Theme-aware SVG icons rendered with `react-native-svg`.
 
 ## Importing icons from Figma
 
-The Figma token export (`tokens/figma/tokens.json`) contains color/typography
+The Figma token exports (`tokens/figma/*.json`) contain color/typography
 tokens only — no icon geometry. To add a real icon from Figma:
 
 1. In Figma, select the icon frame and choose **Export → SVG**.

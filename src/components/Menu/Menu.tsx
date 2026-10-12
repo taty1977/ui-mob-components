@@ -49,14 +49,13 @@ export function MenuView({
 }: MenuViewProps): ReactElement {
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
-      {/* Full-screen backdrop closes the menu on press. */}
-      <Pressable accessibilityLabel="Close menu" className="flex-1" onPress={onClose}>
-        {/* The card swallows presses so tapping its padding doesn't close the menu. */}
-        <Pressable
+      <View className="flex-1">
+        {/* Backdrop is a sibling so card presses can't bubble into it (web). */}
+        <Pressable accessibilityLabel="Close menu" className="absolute inset-0" onPress={onClose} />
+        <View
           accessibilityRole="menu"
-          onPress={() => {}}
           className={[
-            'absolute min-w-44 rounded-lg border border-outline-border bg-misc-paper py-1 shadow-lg',
+            'absolute min-w-44 rounded-lg border border-border-subtle bg-background-surface py-1 shadow-lg',
             className,
           ]
             .filter(Boolean)
@@ -88,18 +87,17 @@ export function MenuView({
                 <Icon name={item.icon} size="sm" tone={item.destructive ? 'error' : 'inherit'} />
               ) : null}
               <Text
-                className={
-                  item.destructive
-                    ? 'text-15 text-palette-error-main'
-                    : 'text-15 text-text-primary'
-                }
+                className={[
+                  'text-15',
+                  item.destructive ? 'text-palette-error-main' : 'text-text-primary',
+                ].join(' ')}
               >
                 {item.label}
               </Text>
             </Pressable>
           ))}
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }
@@ -107,8 +105,7 @@ export function MenuView({
 // --- Component ---------------------------------------------------------------------
 
 /** Dropdown menu. Pass a trigger node (uncontrolled, card anchors below the
- * trigger) or drive open/onClose yourself (controlled, e.g. from Header's
- * onPressMenu button). */
+ * trigger) or drive open/onClose yourself (controlled). */
 export function Menu({
   trigger,
   open: controlledOpen,

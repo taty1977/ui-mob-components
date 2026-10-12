@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { Animated, Easing, LayoutAnimation, Platform, Pressable, Text, View, type PressableProps } from 'react-native';
-
+import { a11yProps } from '../../utils/a11yProps';
 import { Icon } from '../Icon';
 
 // --- Types -----------------------------------------------------------------------
@@ -98,12 +98,7 @@ function StepCircle({
           }}
         />
         {/* Decorative — the Pressable label names the step. */}
-        <View
-          className={className}
-          aria-hidden={true}
-          accessibilityElementsHidden={true}
-          importantForAccessibility="no-hide-descendants"
-        >
+        <View className={className} {...a11yProps(true)}>
           {children}
         </View>
       </View>

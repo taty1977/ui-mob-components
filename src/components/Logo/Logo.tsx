@@ -2,6 +2,8 @@ import type { ReactElement } from 'react';
 import { Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { themeTokens } from '../../themes/themeTokens';
+import { a11yProps } from '../../utils/a11yProps';
+import { themeColor } from '../../utils/themeColor';
 
 export type LogoVariant = 'horizontal' | 'stacked' | 'icon';
 
@@ -15,11 +17,11 @@ export type LogoProps = {
   accessibilityLabel?: string;
 };
 
-// Brand colors come from the theme palette: primary-500 ring, success-500
-// cross, onPrimary center dot.
-const MARK_RING = themeTokens.core.color.primary[500];
-const MARK_CROSS = themeTokens.core.color.success[500];
-const MARK_DOT = themeTokens.semantic.color.text.onPrimary;
+// Brand colors come from the theme palette: primary ring, success cross,
+// onPrimary center dot. themeColor keeps them adaptive on web (CSS vars).
+const MARK_RING = themeColor('palette-primary-main', themeTokens.core.color.primary[500]);
+const MARK_CROSS = themeColor('palette-success-main', themeTokens.core.color.success[500]);
+const MARK_DOT = themeColor('misc-bg-white', themeTokens.semantic.color.text.onPrimary);
 
 /** AllInOne Health logo. Mark and wordmark use theme palette colors. */
 export function Logo({
@@ -39,11 +41,7 @@ export function Logo({
       height={size}
       viewBox="0 0 100 100"
       fill="none"
-      accessible={!decorative}
-      accessibilityElementsHidden={decorative}
-      importantForAccessibility={decorative ? 'no-hide-descendants' : 'auto'}
-      accessibilityLabel={accessibilityLabel}
-      accessibilityRole={decorative ? 'none' : 'image'}
+      {...a11yProps(decorative, accessibilityLabel)}
     >
       <Circle
         cx={50}
@@ -80,7 +78,7 @@ export function Logo({
           numberOfLines={1}
           className={textClass('text-24 font-bold tracking-tight text-text-primary')}
         >
-          {'AllInOne '}<Text style={{ color: MARK_RING }}>Health</Text>
+          {'AllInOne '}<Text className="text-palette-primary-main">Health</Text>
         </Text>
         <Text
           numberOfLines={1}

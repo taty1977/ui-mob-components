@@ -1,20 +1,21 @@
 import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
+import { fn } from 'storybook/test';
 import { Pressable, View } from 'react-native';
 import { Menu, type MenuItem, type MenuProps } from '../Menu';
 import { Icon } from '../../Icon';
 
 // Trigger nodes must be non-pressable; Menu wraps them in its own Pressable.
 const burgerTrigger = (
-  <View className="w-10 h-10 rounded-lg bg-misc-body-bg items-center justify-center text-text-primary">
+  <View className="w-10 h-10 rounded-lg bg-background-canvas items-center justify-center text-text-primary">
     <Icon name="burger-menu" size="md" tone="inherit" />
   </View>
 );
 
 const demoItems: MenuItem[] = [
-  { label: 'Profile', icon: 'user' },
-  { label: 'Documents', icon: 'document' },
-  { label: 'Log out', icon: 'close', destructive: true },
+  { label: 'Profile', icon: 'user', onPress: fn() },
+  { label: 'Documents', icon: 'document', onPress: fn() },
+  { label: 'Log out', icon: 'close', destructive: true, onPress: fn() },
 ];
 
 // Right-pinned frame mirrors the header corner the menu usually opens from.
@@ -28,6 +29,7 @@ const meta = {
   args: {
     items: demoItems,
     trigger: burgerTrigger,
+    onClose: fn(),
   },
   argTypes: {
     items: {
@@ -48,7 +50,7 @@ const meta = {
     onClose: {
       control: false,
       description: 'Fired by backdrop press, item selection, and Android back',
-      table: { category: 'Advanced' },
+      table: { category: 'Actions' },
     },
     position: {
       control: 'object',
@@ -101,7 +103,7 @@ function ControlledDemo(args: MenuProps) {
         accessibilityRole="button"
         accessibilityLabel="Open menu"
         onPress={() => setOpen(true)}
-        className="w-10 h-10 rounded-lg bg-misc-body-bg items-center justify-center text-text-primary"
+        className="w-10 h-10 rounded-lg bg-background-canvas items-center justify-center text-text-primary"
       >
         <Icon name="burger-menu" size="md" tone="inherit" />
       </Pressable>
@@ -109,7 +111,10 @@ function ControlledDemo(args: MenuProps) {
         {...args}
         trigger={undefined}
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          args.onClose?.();
+          setOpen(false);
+        }}
         position={{ top: 60, right: 16 }}
       />
     </Frame>

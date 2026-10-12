@@ -103,7 +103,7 @@ src/
       stories/
       tests/
   themes/                   # generatedTokens.ts (baked tokens) + theme mapping (multi-mode)
-tokens/figma/tokens.json    # exported Figma variables (source of truth)
+tokens/figma/<Mode>.json    # exported Figma variables, one file per theme mode (source of truth)
 ```
 
 ## Usage
@@ -114,7 +114,7 @@ import { Avatar, Button, Header, Heading, Icon, Input, Logo, Menu, BodyText } fr
 <Heading variant="h2" tone="primary">Book an appointment</Heading>
 <BodyText variant="body2" tone="muted">Vitals look stable.</BodyText>
 <Avatar name="Ana" imageUrl="https://…/ana.png" status="online" />
-<Header userName="Ana" unreadCount={3} onPressMenu={() => setMenuOpen(true)} />
+<Header userName="Ana" unreadCount={3} />
 <Menu open={menuOpen} onClose={() => setMenuOpen(false)} items={[{ label: 'Profile', icon: 'user' }]} />
 <Button label="Save" tone="primary" variant="default" />
 <Button

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
+import { fn } from 'storybook/test';
 import { Text, View } from 'react-native';
 import { Stepper } from '../Stepper';
 import { Input } from '../../Input';
@@ -26,6 +27,7 @@ const meta = {
   args: {
     steps: demoSteps,
     tone: 'primary',
+    onStepPress: fn(),
   },
   argTypes: {
     steps: {
@@ -52,7 +54,7 @@ const meta = {
     onStepPress: {
       control: false,
       description: 'Called with the pressed step index (circle or title)',
-      table: { category: 'Advanced' },
+      table: { category: 'Actions' },
     },
     completedIcon: {
       control: false,

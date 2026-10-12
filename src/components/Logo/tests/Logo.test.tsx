@@ -59,17 +59,17 @@ describe('Logo', () => {
   it('keeps the mark decorative in the horizontal variant (the wordmark announces)', () => {
     const element = renderLogo({ accessibilityLabel: 'AllInOne Health' });
     const [mark] = element.props.children as AnyElement[];
-    expect(mark.props.accessibilityRole).toBe('none');
+    expect(mark.props['aria-hidden']).toBe(true);
   });
 
   it('is decorative unless the standalone mark is labeled', () => {
     const plain = renderLogo({ variant: 'icon' });
-    expect(plain.props.accessibilityRole).toBe('none');
-    expect(plain.props.accessible).toBe(false);
+    expect(plain.props['aria-hidden']).toBe(true);
+    expect(plain.props.role).toBeUndefined();
 
     const labeled = renderLogo({ variant: 'icon', accessibilityLabel: 'AllInOne Health' });
-    expect(labeled.props.accessibilityRole).toBe('image');
-    expect(labeled.props.accessible).toBe(true);
-    expect(labeled.props.accessibilityLabel).toBe('AllInOne Health');
+    expect(labeled.props['aria-hidden']).toBeUndefined();
+    expect(labeled.props.role).toBe('img');
+    expect(labeled.props['aria-label']).toBe('AllInOne Health');
   });
 });

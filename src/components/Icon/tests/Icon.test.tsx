@@ -65,16 +65,14 @@ describe('Icon', () => {
 
   it('exposes an accessibility role and label', () => {
     const element = renderIcon({ name: 'close', accessibilityLabel: 'Close dialog' });
-    expect(element.props.accessibilityRole).toBe('image');
-    expect(element.props.accessibilityLabel).toBe('Close dialog');
-    expect(element.props.accessible).toBe(true);
+    expect(element.props.role).toBe('img');
+    expect(element.props['aria-label']).toBe('Close dialog');
+    expect(element.props['aria-hidden']).toBeUndefined();
   });
 
   it('is hidden from assistive technology when no label makes it decorative', () => {
     const element = renderIcon({ name: 'plus' });
-    expect(element.props.accessibilityRole).toBe('none');
-    expect(element.props.accessible).toBe(false);
-    expect(element.props.accessibilityElementsHidden).toBe(true);
-    expect(element.props.importantForAccessibility).toBe('no-hide-descendants');
+    expect(element.props['aria-hidden']).toBe(true);
+    expect(element.props.role).toBeUndefined();
   });
 });

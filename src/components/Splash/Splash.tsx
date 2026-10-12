@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { themeTokens } from '../../themes/themeTokens';
+import { themeColor } from '../../utils/themeColor';
 import { Logo } from '../Logo';
 
 export type SplashProps = {
@@ -25,8 +26,11 @@ export type SplashViewProps = SplashProps & {
   haloStyle?: StyleProp<ViewStyle>;
 };
 
-// Halo color from the palette: soft primary fill.
-const HALO = themeTokens.core.color.palette['primary-opacity-light'];
+// Halo color from the palette: soft primary fill (theme-adaptive on web).
+const HALO = themeColor(
+  'palette-primary-opacity-light',
+  themeTokens.core.color.palette['primary-opacity-light'],
+);
 
 /** Stateless renderer for Splash; exported so unit tests can drive it directly. */
 export function SplashView({

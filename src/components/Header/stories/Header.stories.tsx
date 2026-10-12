@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
+import { fn } from 'storybook/test';
 import { Header } from '../Header';
 
 const meta = {
@@ -9,6 +10,9 @@ const meta = {
     userAvatarUrl: 'https://i.pravatar.cc/84?img=47',
     subtitle: 'How are you feeling today?',
     unreadCount: 3,
+    onPressProfile: fn(),
+    onPressSearch: fn(),
+    onPressNotification: fn(),
   },
   argTypes: {
     title: {
@@ -29,7 +33,7 @@ const meta = {
     },
     showLogo: {
       control: 'boolean',
-      description: 'Brand mark on the left (avatar moves right); hidden while onPressBack is set',
+      description: 'Brand mark on the left (hides the avatar); hidden while onPressBack is set',
       table: { category: 'Appearance' },
     },
     showStatusIndicator: { control: 'boolean', table: { category: 'Appearance' } },
@@ -47,15 +51,15 @@ const meta = {
     onPressBack: {
       control: false,
       description: 'When set, a back button replaces the logo/avatar',
-      table: { category: 'Advanced' },
+      table: { category: 'Actions' },
     },
-    onPressProfile: { control: false, table: { category: 'Advanced' } },
-    onPressNotification: { control: false, table: { category: 'Advanced' } },
-    onPressMenu: {
+    onPressProfile: { control: false, table: { category: 'Actions' } },
+    onPressSearch: {
       control: false,
-      description: 'When set, a burger-menu button shows at the right end',
-      table: { category: 'Advanced' },
+      description: 'When set, a search button shows before the bell',
+      table: { category: 'Actions' },
     },
+    onPressNotification: { control: false, table: { category: 'Actions' } },
     className: { control: 'text', table: { category: 'Advanced' } },
   },
 } satisfies Meta<typeof Header>;
@@ -68,14 +72,15 @@ type Story = StoryObj<typeof meta>;
 export const Playground: Story = {};
 
 export const WithBackButton: Story = {
-  args: { title: 'Appointments', subtitle: undefined, onPressBack: () => {} },
+  args: { title: 'Appointments', subtitle: undefined, onPressBack: fn() },
 };
 
-export const WithMenuButton: Story = {
-  args: { onPressMenu: () => {} },
+// Photo avatar with status dot on the left (logo hidden).
+export const WithAvatar: Story = {
+  args: { showLogo: false },
 };
 
 // Initial fallback, offline status, and the 99+ badge cap.
 export const NoAvatar: Story = {
-  args: { userAvatarUrl: undefined, statusOnline: false, unreadCount: 120 },
+  args: { showLogo: false, userAvatarUrl: undefined, statusOnline: false, unreadCount: 120 },
 };
