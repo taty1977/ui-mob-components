@@ -139,7 +139,7 @@ export function InputView({
 
   // --- Label offsets ---
   const padPx = HORIZONTAL_PADDING[size];
-  const labelEdgePadding = variant === 'standard' ? 0 : padPx.plain;
+  const labelEdgePadding = variant === 'standard' ? 0 : NOTCH_LABEL_LEFT;
   const leftPaddingPx =
     variant === 'standard' && !iconLeft ? 0 : iconLeft ? padPx.withIcon : padPx.plain;
   const rightPaddingPx =
@@ -147,7 +147,7 @@ export function InputView({
   const unshrunkLeft = leftPaddingPx + (iconLeft ? (size === 'small' ? 28 : 34) : 0);
 
   // --- Input ---
-  const filledInputPadding = label ? 'pt-5' : 'py-1';
+  const filledInputPadding = label ? 'pt-5 pb-1' : 'py-1';
 
   const inputClasses = [
     'flex-1 bg-transparent outline-none',
@@ -184,7 +184,7 @@ export function InputView({
           filledTop: {
             wrapperClass: inFieldLabelWrapper.filledTop,
             style: { left: labelEdgePadding, right: labelEdgePadding },
-            textSize: 'text-13',
+            textSize: 'text-13 pl-1',
             onLayout: undefined,
           },
           unshrunk: {

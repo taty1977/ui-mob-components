@@ -80,10 +80,12 @@ describe('Input', () => {
 
     const wrapper = findLabelWrapper(element);
     expect(wrapper?.props.className).toContain('top-1');
+    expect(wrapper?.props.style).toEqual({ left: 12, right: 12 });
     const labelText = (renderedChildren(wrapper) as AnyElement[])[0];
     expect(labelText.props.text).toBe('Email');
+    expect(labelText.props.className).toContain('pl-1');
     // The input reserves room below the shrunk label.
-    expect(findTextInput(fieldRow).props.className).toContain('pt-5');
+    expect(findTextInput(fieldRow).props.className).toContain('pt-5 pb-1');
   });
 
   it('places the label on the border notch for the outlined variant once filled', () => {
