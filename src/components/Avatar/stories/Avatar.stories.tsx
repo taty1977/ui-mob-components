@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
+import { fn } from 'storybook/test';
 import { Text, View } from 'react-native';
 import { Avatar, type AvatarSize } from '../Avatar';
 
@@ -12,6 +13,7 @@ const meta = {
   args: {
     name: 'Ana Gomez',
     imageUrl: demoAvatarUrl,
+    onPress: fn(),
     size: 'md',
     status: 'online',
   },
@@ -43,7 +45,7 @@ const meta = {
     onPress: {
       control: false,
       description: 'When set, the avatar is a button labeled "<name>\'s profile"',
-      table: { category: 'Advanced' },
+      table: { category: 'Actions' },
     },
     accessibilityLabel: { control: 'text', table: { category: 'Accessibility' } },
     className: { control: 'text', table: { category: 'Advanced' } },

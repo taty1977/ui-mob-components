@@ -10,7 +10,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { Icon } from '../Icon';
+import { IconButton } from '../IconButton';
 import { Logo } from '../Logo';
 
 const IS_WEB = Platform.OS === 'web';
@@ -91,15 +91,13 @@ export function DrawerView({
         >
           <View className="flex-row items-center justify-between px-4 py-2">
             <Logo variant="icon" size={20} />
-            <Pressable
-              onPress={onClose}
-              accessibilityRole="button"
+            <IconButton
+              name={side === 'left' ? 'chevron-left' : 'chevron-right'}
+              size="md"
+              tone="primary"
               accessibilityLabel="Close drawer"
-              hitSlop={8}
-              className="p-1 text-text-secondary"
-            >
-              <Icon name={side === 'left' ? 'chevron-left' : 'chevron-right'} size="md" tone="primary" />
-            </Pressable>
+              onPress={onClose}
+            />
           </View>
           {children}
         </Panel>

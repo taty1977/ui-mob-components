@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { a11yProps } from '../../utils/a11yProps';
 import { Avatar } from '../Avatar';
-import { Icon } from '../Icon';
+import { IconButton } from '../IconButton';
 import { Logo } from '../Logo';
 
 // --- Types -----------------------------------------------------------------------
@@ -74,15 +74,13 @@ export function Header({
     >
       <View className="flex-row items-center gap-3">
         {onPressBack ? (
-          <Pressable
-            onPress={onPressBack}
-            accessibilityRole="button"
+          <IconButton
+            name="chevron-left"
+            size="lg"
             accessibilityLabel="Go back"
-            hitSlop={8}
+            onPress={onPressBack}
             className="-ml-2 -mr-2 text-text-primary"
-          >
-            <Icon name="chevron-left" size="lg" tone="inherit" />
-          </Pressable>
+          />
         ) : showLogo ? (
           <Logo variant="icon" size={32} />
         ) : (
@@ -102,27 +100,24 @@ export function Header({
 
         <View className="flex-row items-center gap-0">
           {onPressSearch ? (
-            <Pressable
-              onPress={onPressSearch}
-              accessibilityRole="button"
+            <IconButton
+              name="magnifier"
+              size="lg"
               accessibilityLabel="Search"
-              hitSlop={8}
-              className="items-center justify-center text-text-primary"
-            >
-              <Icon name="magnifier" size="lg" tone="inherit" />
-            </Pressable>
+              onPress={onPressSearch}
+              className="text-text-primary"
+            />
           ) : null}
 
-          <Pressable
-            onPress={onPressNotification}
-            accessibilityRole="button"
+          <IconButton
+            name="bell"
+            size="lg"
             accessibilityLabel={
               unreadCount > 0 ? `Notifications, ${badgeText} unread` : 'Notifications'
             }
-            hitSlop={8}
-            className="items-center justify-center text-text-primary"
+            onPress={onPressNotification}
+            className="text-text-primary"
           >
-            <Icon name="bell" size="lg" tone="inherit" />
             {unreadCount > 0 ? (
               <View
                 {...DECORATIVE}
@@ -133,7 +128,7 @@ export function Header({
                 </Text>
               </View>
             ) : null}
-          </Pressable>
+          </IconButton>
 
         </View>
       </View>

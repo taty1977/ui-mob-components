@@ -15,7 +15,7 @@ export type IconTone =
   | 'muted'
   | 'inverse';
 
-const sizeValues: Record<IconSize, number> = {
+export const iconSizeValues: Record<IconSize, number> = {
   sm: 16,
   md: 20,
   lg: 24,
@@ -55,7 +55,7 @@ export function Icon({
   accessibilityLabel,
   children,
 }: IconProps): ReactElement<SvgProps> {
-  const dimension = sizeValues[size];
+  const dimension = iconSizeValues[size];
   const colorClass = tone === 'inherit' ? undefined : toneClasses[tone];
   const classes = [colorClass, className].filter(Boolean).join(' ');
   // Without a label the icon is decorative: hide it from assistive technology

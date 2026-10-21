@@ -24,6 +24,8 @@ export { Heading } from './Heading';
 export type { HeadingProps, HeadingTone, HeadingVariant, HeadingWeight } from './Heading';
 export { Icon, iconPaths } from './Icon';
 export type { IconName, IconProps, IconSize, IconTone } from './Icon';
+export { IconButton } from './IconButton';
+export type { IconButtonProps } from './IconButton';
 export { Input } from './Input';
 export type { InputProps, InputSize, InputTone, InputVariant } from './Input';
 export { Logo } from './Logo';
