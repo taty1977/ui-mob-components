@@ -28,6 +28,7 @@ export type {
 	MenuItem,
 	MenuPosition,
 	MenuProps,
+	MenuTone,
 	ScreenProps,
 	SplashProps,
 	StackAlign,
@@ -51,3 +52,5 @@ export {
 	themeTokens,
 } from './themes/themeTokens';
 export type { FigmaThemeMode, ThemeMode } from './themes/themeTokens';
+export { paletteTones, paletteToneStyles, navigationTones } from './themes/paletteTones';
+export type { PaletteTone, PaletteToneStyles, NavigationTone } from './themes/paletteTones';

@@ -10,6 +10,7 @@ vi.mock('react-native-svg', () => {
 
 import { DrawerView } from '../Drawer';
 import type { DrawerViewProps } from '../Drawer';
+import { NavItemRow, type NavItemRowProps } from '../../NavItem';
 
 type AnyElement = ReactElement & { props: Record<string, unknown> };
 
@@ -78,5 +79,38 @@ describe('Drawer', () => {
 
   it('renders the panel content', () => {
     expect(byText(renderDrawer(), 'Content')).toHaveLength(1);
+  });
+
+  // --- Items --------------------------------------------------------------------
+
+  const rowsOf = (root: ReactNode) =>
+    findAll(root, (el) => el.type === NavItemRow).map((el) => el.props as NavItemRowProps);
+
+  it('renders item rows above children with the drawer tone', () => {
+    const drawer = renderDrawer({
+      tone: 'secondary',
+      items: [{ label: 'Dashboard', icon: 'house' }, { label: 'Labs' }],
+    });
+    const rows = rowsOf(drawer);
+    expect(rows.map((row) => row.item.label)).toEqual(['Dashboard', 'Labs']);
+    expect(rows.every((row) => row.tone === 'secondary' && row.size === 'md')).toBe(true);
+    expect(byText(drawer, 'Content')).toHaveLength(1);
+  });
+
+  it('defaults to the primary tone and renders no rows without items', () => {
+    expect(rowsOf(renderDrawer())).toHaveLength(0);
+    expect(rowsOf(renderDrawer({ items: [{ label: 'Labs' }] }))[0].tone).toBe('primary');
+  });
+
+  it('calls the item handler and closes when an item is selected', () => {
+    const onClose = vi.fn();
+    const onPress = vi.fn();
+    const row = rowsOf(renderDrawer({ onClose, items: [{ label: 'Labs', onPress }] }))[0];
+    const pressable = NavItemRow(row) as unknown as AnyElement;
+
+    (pressable.props.onPress as () => void)();
+
+    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

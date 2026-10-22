@@ -65,11 +65,17 @@ const renderView = (props: Parameters<typeof InputView>[0]) =>
 describe('Input', () => {
   // --- Label placement (MUI) ------------------------------------------------------
 
-  it('shrinks the label above the field for the standard variant once filled', () => {
+  it('floats the standard label over the top edge once filled, like the web field', () => {
     const element = renderView({ label: 'Email', variant: 'standard', focused: false, filled: true });
-    const labelEl = findLabel(element);
-    expect(labelEl.props.text).toBe('Email');
-    expect(labelEl.props.className).toContain('mb-1');
+    const fieldRow = findFieldRow(element);
+    expect((renderedChildren(element) as AnyElement[])[0]).toBe(fieldRow);
+    expect(fieldRow.props.className).toContain('mt-2');
+
+    const wrapper = findLabelWrapper(element);
+    expect(wrapper?.props.className).toContain('-top-2 left-0');
+    const labelText = (renderedChildren(wrapper) as AnyElement[])[0];
+    expect(labelText.props.text).toBe('Email');
+    expect(labelText.props.className).toContain('pl-4 text-13 leading-20');
   });
 
   it('shrinks the label to the top inside the box for the filled variant', () => {
@@ -79,13 +85,20 @@ describe('Input', () => {
     expect((renderedChildren(element) as AnyElement[])[0]).toBe(fieldRow);
 
     const wrapper = findLabelWrapper(element);
-    expect(wrapper?.props.className).toContain('top-1');
-    expect(wrapper?.props.style).toEqual({ left: 12, right: 12 });
+    expect(wrapper?.props.className).toContain('left-4 right-4 top-1');
     const labelText = (renderedChildren(wrapper) as AnyElement[])[0];
     expect(labelText.props.text).toBe('Email');
-    expect(labelText.props.className).toContain('pl-1');
-    // The input reserves room below the shrunk label.
-    expect(findTextInput(fieldRow).props.className).toContain('pt-5 pb-1');
+    expect(labelText.props.className).toContain('text-13 leading-14');
+    // The input drops below the shrunk label, like the web field.
+    expect(findTextInput(fieldRow).props.className).toContain('self-stretch pb-0 pt-[18px]');
+  });
+
+  it('keeps empty filled-variant text centered until the label shrinks', () => {
+    const element = renderView({ label: 'Email', variant: 'filled', focused: true });
+    const input = findTextInput(findFieldRow(element));
+    expect(input.props.className).toContain('py-0');
+    expect(input.props.className).not.toContain('pt-[18px]');
+    expect(input.props.textAlignVertical).toBe('center');
   });
 
   it('places the label on the border notch for the outlined variant once filled', () => {
@@ -112,6 +125,9 @@ describe('Input', () => {
     const labelText = (renderedChildren(overlay) as AnyElement[])[0];
     expect(labelText.props.text).toBe('Email');
     expect(labelText.props.className).toContain('text-text-secondary');
+    // Like the web field, the resting label uses the 13px label size, not the input size.
+    expect(labelText.props.className).toContain('text-13 leading-20');
+    expect(overlay?.props.style).toMatchObject({ left: 16, right: 16 });
   });
 
   it('keeps the label inside filled and standard fields while empty', () => {
@@ -156,6 +172,7 @@ describe('Input', () => {
     expect(findLabel(element).props.required).toBe(true);
 
     const labelText = LabelText({ text: 'Email', required: true, className: '' }) as unknown as AnyElement;
+    expect(labelText.props.className).toContain('font-sans font-medium');
     const asterisk = [labelText.props.children as ReactNode]
       .flat()
       .filter(Boolean)
@@ -288,6 +305,7 @@ describe('Input', () => {
     const input = findTextInput(fieldRow);
     expect(input.props.editable).toBe(false);
     expect(input.props.className).toContain('text-text-disabled');
+    expect(input.props.placeholderClassName).toBe('text-text-secondary');
     expect(fieldRow.props.className).toContain('border-text-disabled');
   });
 
@@ -301,6 +319,17 @@ describe('Input', () => {
     expect(classes).toContain('pl-4');
     expect(classes).toContain('pr-4');
     expect(findTextInput(fieldRow).props.className).toContain('text-15');
+  });
+
+  it('uses the shared normal-size text inset and typography', () => {
+    const element = renderView({ size: 'normal', focused: false });
+    const fieldRow = findFieldRow(element);
+    const classes = String(fieldRow.props.className).split(' ');
+    const inputClasses = String(findTextInput(fieldRow).props.className).split(' ');
+    expect(classes).toContain('pl-4');
+    expect(classes).toContain('pr-4');
+    expect(inputClasses).toContain('font-sans');
+    expect(inputClasses).toContain('leading-5');
   });
 
   it('matches field frames per variant and size', () => {
@@ -328,11 +357,11 @@ describe('Input', () => {
     const leftOnly = renderView({ iconLeft: '🔍', focused: false });
     const leftClasses = String(findFieldRow(leftOnly).props.className).split(' ');
     expect(leftClasses).toContain('pl-3');
-    expect(leftClasses).toContain('pr-6');
+    expect(leftClasses).toContain('pr-4');
 
     const rightOnly = renderView({ iconRight: '⌄', focused: false });
     const rightClasses = String(findFieldRow(rightOnly).props.className).split(' ');
-    expect(rightClasses).toContain('pl-6');
+    expect(rightClasses).toContain('pl-4');
     expect(rightClasses).toContain('pr-3');
   });
 
@@ -341,7 +370,7 @@ describe('Input', () => {
     const classes = String(findFieldRow(element).props.className).split(' ');
     expect(classes).toContain('pl-3');
     expect(classes).not.toContain('pr-3');
-    expect(classes).not.toContain('pr-6');
+    expect(classes).toContain('pr-4');
   });
 
   it('distinguishes variant chrome: outlined, filled, and standard', () => {
@@ -355,6 +384,7 @@ describe('Input', () => {
     const filledClasses = String(findFieldRow(filled).props.className).split(' ');
     expect(filledClasses).toContain('bg-action-hover');
     expect(filledClasses).toContain('border-b');
+    expect(filledClasses).not.toContain('hover:bg-action-selected');
 
     const standard = renderView({ variant: 'standard', focused: false });
     const standardClasses = String(findFieldRow(standard).props.className).split(' ');

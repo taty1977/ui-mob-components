@@ -16,7 +16,7 @@ export function LabelText({
   onLayout,
 }: LabelTextProps): ReactElement {
   return (
-    <Text className={className} onLayout={onLayout}>
+    <Text className={['font-sans font-medium', className].join(' ')} onLayout={onLayout}>
       {text}
       {required ? <Text className="text-palette-error-main"> *</Text> : null}
     </Text>

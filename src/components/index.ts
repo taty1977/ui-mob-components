@@ -15,7 +15,7 @@ export type {
   ButtonVariant,
 } from './Button';
 export { Drawer } from './Drawer';
-export type { DrawerProps, DrawerSide } from './Drawer';
+export type { DrawerItem, DrawerProps, DrawerSide, DrawerTone } from './Drawer';
 export { Footer } from './Footer';
 export type { FooterProps, FooterTab, FooterTone, FooterVariant } from './Footer';
 export { Header } from './Header';
@@ -31,7 +31,7 @@ export type { InputProps, InputSize, InputTone, InputVariant } from './Input';
 export { Logo } from './Logo';
 export type { LogoProps, LogoVariant } from './Logo';
 export { Menu } from './Menu';
-export type { MenuItem, MenuPosition, MenuProps } from './Menu';
+export type { MenuItem, MenuPosition, MenuProps, MenuTone } from './Menu';
 export { Screen } from './Screen';
 export type { ScreenProps } from './Screen';
 export { Splash } from './Splash';

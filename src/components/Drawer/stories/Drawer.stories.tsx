@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
 import { fn } from 'storybook/test';
 import { Text, View } from 'react-native';
-import { Drawer, type DrawerProps } from '../Drawer';
-import { Icon, type IconName } from '../../Icon';
+import { Drawer, type DrawerItem, type DrawerProps } from '../Drawer';
+import { Icon } from '../../Icon';
+import { navigationTones } from '../../../themes/paletteTones';
+import { useSingleActionLog } from '../../NavItem/stories/useSingleActionLog';
 
 // Trigger nodes must be non-pressable; Drawer wraps them in its own Pressable.
 const menuTrigger = (
@@ -17,29 +19,27 @@ const profileTrigger = (
   </View>
 );
 
-const demoDestinations: { label: string; icon: IconName }[] = [
-  { label: 'Dashboard', icon: 'house' },
-  { label: 'Doctors', icon: 'doctor' },
-  { label: 'Labs', icon: 'lab' },
-  { label: 'Profile', icon: 'user' },
+const demoItems: DrawerItem[] = [
+  { label: 'Dashboard', icon: 'house', onPress: fn().mockName('Dashboard onPress') },
+  { label: 'Doctors', icon: 'doctor', onPress: fn().mockName('Doctors onPress') },
+  { label: 'Labs', icon: 'lab', onPress: fn().mockName('Labs onPress') },
+  { label: 'Profile', icon: 'user', onPress: fn().mockName('Profile onPress') },
 ];
 
-const demoContent = (
-  <View className="gap-1 py-2">
-    {demoDestinations.map((item) => (
-      <View key={item.label} className="flex-row items-center gap-3 px-4 py-3">
-        <Icon name={item.icon} size="md" tone="primary" />
-        <Text className="text-15 text-text-primary">{item.label}</Text>
-      </View>
-    ))}
+// Free-form children render below the item rows.
+const demoFooter = (
+  <View className="px-4 py-3">
+    <Text className="text-13 text-text-secondary">Signed in as Ana Gomez</Text>
   </View>
 );
 
-// Trigger sits on the same edge the drawer opens from.
+// Trigger sits on the same edge the drawer opens from; item presses log onPress,
+// dismissals log onClose � one Actions entry per click.
 function FramedDrawer(args: DrawerProps) {
+  const logged = useSingleActionLog(args.items, args.onClose);
   return (
     <View className={args.side === 'right' ? 'flex-row justify-end' : 'flex-row'}>
-      <Drawer {...args} />
+      <Drawer {...args} items={logged.items} onClose={logged.onClose} />
     </View>
   );
 }
@@ -52,7 +52,8 @@ const meta = {
   render: (args) => <FramedDrawer {...args} />,
   args: {
     trigger: menuTrigger,
-    children: demoContent,
+    items: demoItems,
+    tone: 'primary',
     onClose: fn(),
   },
   argTypes: {
@@ -63,11 +64,16 @@ const meta = {
       description: 'Anchor node; tapping opens the drawer (uncontrolled)',
       table: { category: 'Content' },
     },
+    items: {
+      control: 'object',
+      description: 'Navigation rows: label, optional registry icon, destructive, disabled, onPress',
+      table: { category: 'Content' },
+    },
     children: {
       control: { type: 'radio' },
-      options: ['Navigation', 'Empty'],
-      mapping: { Navigation: demoContent, Empty: undefined },
-      description: 'Drawer panel content',
+      options: ['None', 'Account footer'],
+      mapping: { None: undefined, 'Account footer': demoFooter },
+      description: 'Free-form panel content rendered below the items',
       table: { category: 'Content' },
     },
     side: {
@@ -81,6 +87,13 @@ const meta = {
       description: 'Panel width in px',
       table: { category: 'Appearance' },
     },
+    tone: {
+      control: 'select',
+      options: navigationTones,
+      description:
+        'Brand tone (primary | secondary) for item hover/focus/press and the close button',
+      table: { category: 'Appearance' },
+    },
     open: {
       control: 'boolean',
       description: 'Controlled open state; omit to let the trigger drive it',
@@ -88,8 +101,9 @@ const meta = {
     },
     onClose: {
       control: false,
-      description: 'Fired by backdrop press and Android back',
-      table: { category: 'Actions' },
+      description:
+        'Fired by backdrop press, close button, item selection, and Android back (stories log dismissals only; item presses log onPress)',
+      table: { category: 'Events' },
     },
     className: {
       control: 'text',
@@ -112,4 +126,27 @@ export const RightSide: Story = {
 
 export const LeftSide: Story = {
   args: { side: 'left' },
+};
+
+// Disabled rows dim; destructive rows take the error tone; children render below.
+export const ItemVariants: Story = {
+  args: {
+    tone: 'secondary',
+    children: demoFooter,
+    items: [
+      { label: 'Dashboard', icon: 'house', onPress: fn().mockName('Dashboard onPress') },
+      {
+        label: 'Premium labs',
+        icon: 'lock',
+        disabled: true,
+        onPress: fn().mockName('Premium labs onPress'),
+      },
+      {
+        label: 'Sign out',
+        icon: 'close',
+        destructive: true,
+        onPress: fn().mockName('Sign out onPress'),
+      },
+    ],
+  },
 };

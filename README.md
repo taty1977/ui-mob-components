@@ -1,6 +1,6 @@
 # ui-mob-components
 
-Reusable TypeScript components for React Native, styled with NativeWind 4 and themed from Figma design tokens.
+Cross-platform React Native UI components for iOS, Android, and the web, styled with NativeWind 4 and themed from Figma design tokens. The library shares its token-generation architecture with [ui_components](../ui_components), with interactive examples available in Storybook.
 
 ## Development
 

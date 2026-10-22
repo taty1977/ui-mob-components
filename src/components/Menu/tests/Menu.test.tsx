@@ -12,6 +12,7 @@ vi.mock('react-native-svg', () => {
 import { MenuView } from '../Menu';
 import type { MenuItem, MenuViewProps } from '../Menu';
 import { Icon } from '../../Icon';
+import { NavItemRow, type NavItemRowProps } from '../../NavItem';
 
 type AnyElement = ReactElement & { props: Record<string, unknown> };
 
@@ -31,6 +32,8 @@ const findAll = (node: ReactNode, match: (el: AnyElement) => boolean): AnyElemen
   if (Array.isArray(node)) return node.flatMap((n) => findAll(n, match));
   if (!node || typeof node !== 'object') return [];
   const el = node as AnyElement;
+  // Expand the shared row so its Pressable/Text/Icon are searchable.
+  if (el.type === NavItemRow) return findAll(NavItemRow(el.props as NavItemRowProps), match);
   const children = (el.props as { children?: ReactNode }).children;
   return [...(match(el) ? [el] : []), ...findAll(children, match)];
 };
@@ -70,6 +73,32 @@ describe('Menu', () => {
     const row = findAll(renderMenu(), (el) => el.props.disabled === true)[0];
     expect(disabledRow).toBeTruthy();
     expect((row.props.className as string)).toContain('opacity-40');
+    expect(row.props.className).not.toContain('hover:bg-');
+  });
+
+  it('highlights enabled items with the theme tone on hover, focus, and press', () => {
+    const row = byRole(renderMenu(), 'menuitem')[0];
+    expect(row.props.className).toContain('hover:bg-palette-primary-opacity-light ');
+    expect(row.props.className).toContain('focus:bg-palette-primary-opacity-light ');
+    expect(row.props.className).toContain('active:bg-palette-primary-opacity-main');
+
+    const toned = byRole(renderMenu({ tone: 'secondary' }), 'menuitem')[0];
+    expect(toned.props.className).toContain('hover:bg-palette-secondary-opacity-light ');
+  });
+
+  it('tints label and icon with the tone on row hover, not on disabled rows', () => {
+    const menu = renderMenu({ tone: 'secondary' });
+    expect(byText(menu, 'Profile')[0].props.className).toContain(
+      'group-hover:text-palette-secondary-main'
+    );
+    const icon = findAll(menu, (el) => el.type === Icon)[0];
+    expect(icon.props.className).toContain('group-hover:text-palette-secondary-main');
+    expect(byText(menu, 'Premium')[0].props.className).not.toContain('group-hover:');
+  });
+
+  it('uses the error tone for destructive item highlights', () => {
+    const rows = byRole(renderMenu({ tone: 'secondary' }), 'menuitem');
+    expect(rows[2].props.className).toContain('hover:bg-palette-error-opacity-light ');
   });
 
   // --- Behavior ---------------------------------------------------------------------

@@ -4,8 +4,9 @@ import { Text, View } from 'react-native';
 import { Stepper } from '../Stepper';
 import { Input } from '../../Input';
 import { Icon } from '../../Icon';
+import { paletteTones } from '../../../themes/paletteTones';
 
-const tones = ['primary', 'secondary', 'error', 'warning', 'info', 'success'] as const;
+const tones = paletteTones;
 
 // The middle step shows an inline Input when active.
 const demoSteps = [
@@ -54,7 +55,7 @@ const meta = {
     onStepPress: {
       control: false,
       description: 'Called with the pressed step index (circle or title)',
-      table: { category: 'Actions' },
+      table: { category: 'Events' },
     },
     completedIcon: {
       control: false,
@@ -79,12 +80,12 @@ export const Playground: Story = {
 };
 
 export const Tones: Story = {
-  render: () => (
+  render: ({ onStepPress }) => (
     <View className="gap-6">
       {tones.map((tone) => (
         <View key={tone} className="gap-1">
           <Text className="text-13 font-semibold capitalize text-text-secondary">{tone}</Text>
-          <Stepper tone={tone} defaultStep={1} steps={toneSteps} />
+          <Stepper tone={tone} defaultStep={1} steps={toneSteps} onStepPress={onStepPress} />
         </View>
       ))}
     </View>
@@ -93,9 +94,10 @@ export const Tones: Story = {
 
 // Steps can swap the number for any node; completedIcon overrides the default check.
 export const CustomIcons: Story = {
-  render: () => (
+  render: ({ onStepPress }) => (
     <Stepper
       defaultStep={1}
+      onStepPress={onStepPress}
       completedIcon={<Icon name="check" size="sm" tone="inverse" />}
       steps={[
         { title: 'Account', icon: <Icon name="user" size="sm" tone="inverse" /> },

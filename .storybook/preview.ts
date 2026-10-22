@@ -74,7 +74,7 @@ const ThemeFrame = ({ Story, platform }: { Story: ComponentType; platform: Platf
 const preview: Preview = {
 	parameters: {
 		options: {
-			storySort: { order: ['All Components'] },
+			storySort: { order: ['Design System', ['Introduction'], '*'] },
 		},
 		viewport: {
 			options: {

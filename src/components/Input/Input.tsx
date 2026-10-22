@@ -6,6 +6,7 @@ import {
   fieldFrame,
   fieldGap,
   HORIZONTAL_PADDING,
+  inFieldLabelText,
   inFieldLabelWrapper,
   inputTextSize,
   NOTCH_LABEL_LEFT,
@@ -75,13 +76,15 @@ export function InputView({
   ...props
 }: InputViewProps): ReactElement {
   // --- Label placement ---
-  const labelPlacement: InFieldLabelPlacement | 'above' | undefined =
+  const labelPlacement: InFieldLabelPlacement | undefined =
     !label || (!filled && Boolean(placeholder))
       ? undefined
       : filled
         ? shrunkPlacement[variant]
         : 'unshrunk';
   const notchLabel = labelPlacement === 'notch';
+  // Outlined and standard labels straddle the top edge, so the field drops by their overhang.
+  const overhangingLabel = notchLabel || labelPlacement === 'standardTop';
 
   // --- Colors ---
   const toneStyle = toneClasses[disabled ? 'disabled' : error ? 'error' : tone];
@@ -98,21 +101,15 @@ export function InputView({
   const borderWidth = borderWidthClasses[variant][focused ? 'focus' : 'rest'];
   const notchPieceWidth = notchPieceWidthClasses[focused ? 'focus' : 'rest'];
 
-  const paddingLeft =
-    variant === 'standard' && !iconLeft
-      ? undefined
-      : iconLeft
-        ? paddingLeftClasses[size].withIcon
-        : paddingLeftClasses[size].plain;
-  const paddingRight =
-    variant === 'standard' && !iconRight
-      ? undefined
-      : iconRight
-        ? paddingRightClasses[size].withIcon
-        : paddingRightClasses[size].plain;
+  const paddingLeft = iconLeft
+    ? paddingLeftClasses[size].withIcon
+    : paddingLeftClasses[size].plain;
+  const paddingRight = iconRight
+    ? paddingRightClasses[size].withIcon
+    : paddingRightClasses[size].plain;
 
   const fieldClasses = [
-    'flex-row items-center',
+    'flex-row items-center font-sans transition-colors',
     fieldGap[size],
     notchGap ? 'group relative bg-background-surface' : variantBase[variant],
     fieldFrame[variant][size],
@@ -121,9 +118,12 @@ export function InputView({
     notchGap ? undefined : borderWidth,
     notchGap ? undefined : borderTone,
     iconTone,
-    !notchGap && !disabled && !error ? toneStyle.hoverBorder : undefined,
-    variant === 'filled' && !disabled && !error ? 'hover:bg-action-selected' : undefined,
-    notchLabel ? 'mt-2' : undefined,
+    !notchGap && !disabled && !error
+      ? focused
+        ? borderTone
+        : toneStyle.hoverBorder
+      : undefined,
+    overhangingLabel ? 'mt-2' : undefined,
   ]
     .filter(Boolean)
     .join(' ');
@@ -132,27 +132,26 @@ export function InputView({
     [
       extra,
       borderTone,
-      !disabled && !error ? toneStyle.groupHoverBorder : undefined,
+      !disabled && !error && !focused ? toneStyle.groupHoverBorder : undefined,
     ]
       .filter(Boolean)
       .join(' ');
 
   // --- Label offsets ---
   const padPx = HORIZONTAL_PADDING[size];
-  const labelEdgePadding = variant === 'standard' ? 0 : NOTCH_LABEL_LEFT;
-  const leftPaddingPx =
-    variant === 'standard' && !iconLeft ? 0 : iconLeft ? padPx.withIcon : padPx.plain;
-  const rightPaddingPx =
-    variant === 'standard' && !iconRight ? 0 : iconRight ? padPx.withIcon : padPx.plain;
-  const unshrunkLeft = leftPaddingPx + (iconLeft ? (size === 'small' ? 28 : 34) : 0);
+  const leftPaddingPx = iconLeft ? padPx.withIcon : padPx.plain;
+  const rightPaddingPx = iconRight ? padPx.withIcon : padPx.plain;
+  const unshrunkLeft = leftPaddingPx + (iconLeft ? (size === 'small' ? 28 : 30) : 0);
 
   // --- Input ---
-  const filledInputPadding = label ? 'pt-5 pb-1' : 'py-1';
+  // Like the web field: text stays centered until a filled-variant label shrinks to the top,
+  // then the input stretches and drops below it (18px top padding).
+  const shrunkFilledLabel = variant === 'filled' && labelPlacement === 'filledTop';
 
   const inputClasses = [
-    'flex-1 bg-transparent outline-none',
+    'flex-1 bg-transparent font-sans leading-5 outline-none',
     inputTextSize[size],
-    variant === 'filled' ? filledInputPadding : undefined,
+    shrunkFilledLabel ? 'self-stretch pb-0 pt-[18px]' : 'py-0',
     disabled ? 'text-text-disabled' : 'text-text-primary',
     inputClassName,
   ]
@@ -164,47 +163,23 @@ export function InputView({
     Platform.OS === 'web' && error ? ({ 'aria-invalid': true } as const) : undefined;
 
   // --- In-field label config ---
-  const inFieldLabel =
-    label &&
-    (labelPlacement === 'notch' ||
-      labelPlacement === 'filledTop' ||
-      labelPlacement === 'unshrunk')
-      ? {
-          notch: {
-            wrapperClass: [
-              inFieldLabelWrapper.notch,
-              notchGap ? undefined : 'bg-background-surface',
-            ]
-              .filter(Boolean)
-              .join(' '),
-            style: undefined,
-            textSize: 'text-13 px-1',
-            onLayout: onNotchLabelLayout,
-          },
-          filledTop: {
-            wrapperClass: inFieldLabelWrapper.filledTop,
-            style: { left: labelEdgePadding, right: labelEdgePadding },
-            textSize: 'text-13 pl-1',
-            onLayout: undefined,
-          },
-          unshrunk: {
-            wrapperClass: inFieldLabelWrapper.unshrunk,
-            style: { left: unshrunkLeft, right: rightPaddingPx },
-            textSize: inputTextSize[size],
-            onLayout: undefined,
-          },
-        }[labelPlacement]
-      : undefined;
+  const inFieldLabel = labelPlacement
+    ? {
+        wrapperClass: [
+          inFieldLabelWrapper[labelPlacement],
+          notchLabel && !notchGap ? 'bg-background-surface' : undefined,
+        ]
+          .filter(Boolean)
+          .join(' '),
+        style:
+          labelPlacement === 'unshrunk' ? { left: unshrunkLeft, right: rightPaddingPx } : undefined,
+        textClass: inFieldLabelText[labelPlacement],
+        onLayout: notchLabel ? onNotchLabelLayout : undefined,
+      }
+    : undefined;
 
   return (
     <View className={className}>
-      {label && labelPlacement === 'above' ? (
-        <LabelText
-          text={label}
-          required={required}
-          className={['mb-1 text-13', labelTone].join(' ')}
-        />
-      ) : null}
       <View className={fieldClasses}>
         {notchGap ? (
           <>
@@ -237,7 +212,7 @@ export function InputView({
             <LabelText
               text={label}
               required={required}
-              className={[inFieldLabel.textSize, labelTone].join(' ')}
+              className={[inFieldLabel.textClass, labelTone].join(' ')}
             />
           </View>
         ) : null}
@@ -246,7 +221,9 @@ export function InputView({
           accessibilityLabel={accessibilityLabel ?? label}
           className={inputClasses}
           placeholder={placeholder}
-          placeholderClassName="text-text-disabled"
+          placeholderClassName="text-text-secondary"
+          // Android otherwise adds font padding and top-aligns text in a stretched input.
+          textAlignVertical="center"
           {...props}
           {...invalidProps}
           editable={!disabled}
@@ -255,7 +232,7 @@ export function InputView({
         {iconRight}
       </View>
       {helperText ? (
-        <Text className={['mt-1 text-13', helperTone].join(' ')}>{helperText}</Text>
+        <Text className={['mt-1 font-sans text-13', helperTone].join(' ')}>{helperText}</Text>
       ) : null}
     </View>
   );

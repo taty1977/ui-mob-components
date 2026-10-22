@@ -1,10 +1,10 @@
 import { Pressable, Text, View, type PressableProps } from 'react-native';
 import type { ReactNode } from 'react';
+import { paletteToneStyles } from '../../themes/paletteTones';
 import {
   iconGapClasses,
   sizeClasses,
   textSizeClasses,
-  toneStyles,
   type ButtonSize,
   type ButtonTone,
   type ButtonVariant,
@@ -35,7 +35,7 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const toneStyle = toneStyles[tone];
+  const toneStyle = paletteToneStyles[tone];
   // Compose each variant's chrome from the tone's style parts.
   const variantClasses: Record<ButtonVariant, string> = {
     default: `${toneStyle.default} ${toneStyle.defaultState}`,

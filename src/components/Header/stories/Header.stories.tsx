@@ -51,15 +51,15 @@ const meta = {
     onPressBack: {
       control: false,
       description: 'When set, a back button replaces the logo/avatar',
-      table: { category: 'Actions' },
+      table: { category: 'Events' },
     },
-    onPressProfile: { control: false, table: { category: 'Actions' } },
+    onPressProfile: { control: false, table: { category: 'Events' } },
     onPressSearch: {
       control: false,
       description: 'When set, a search button shows before the bell',
-      table: { category: 'Actions' },
+      table: { category: 'Events' },
     },
-    onPressNotification: { control: false, table: { category: 'Actions' } },
+    onPressNotification: { control: false, table: { category: 'Events' } },
     className: { control: 'text', table: { category: 'Advanced' } },
   },
 } satisfies Meta<typeof Header>;

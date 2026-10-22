@@ -4,6 +4,8 @@ import { fn } from 'storybook/test';
 import { Pressable, View } from 'react-native';
 import { Menu, type MenuItem, type MenuProps } from '../Menu';
 import { Icon } from '../../Icon';
+import { navigationTones } from '../../../themes/paletteTones';
+import { useSingleActionLog } from '../../NavItem/stories/useSingleActionLog';
 
 // Trigger nodes must be non-pressable; Menu wraps them in its own Pressable.
 const burgerTrigger = (
@@ -13,15 +15,32 @@ const burgerTrigger = (
 );
 
 const demoItems: MenuItem[] = [
-  { label: 'Profile', icon: 'user', onPress: fn() },
-  { label: 'Documents', icon: 'document', onPress: fn() },
-  { label: 'Log out', icon: 'close', destructive: true, onPress: fn() },
+  { label: 'Profile', icon: 'user', onPress: fn().mockName('Profile onPress') },
+  {
+    label: 'Documents',
+    icon: 'document',
+    onPress: fn().mockName('Documents onPress'),
+  },
+  {
+    label: 'Log out',
+    icon: 'close',
+    destructive: true,
+    onPress: fn().mockName('Log out onPress'),
+  },
 ];
 
 // Right-pinned frame mirrors the header corner the menu usually opens from.
 const Frame = ({ children }: { children: ReactNode }) => (
   <View className="flex-row justify-end p-4">{children}</View>
 );
+
+const tones = navigationTones;
+
+// One Actions entry per click: item presses log onPress, dismissals log onClose.
+function LoggedMenu(args: MenuProps) {
+  const logged = useSingleActionLog(args.items, args.onClose);
+  return <Menu {...args} items={logged.items ?? []} onClose={logged.onClose} />;
+}
 
 const meta = {
   title: 'Navigation/Menu',
@@ -30,6 +49,7 @@ const meta = {
     items: demoItems,
     trigger: burgerTrigger,
     onClose: fn(),
+    tone: 'primary',
   },
   argTypes: {
     items: {
@@ -47,10 +67,18 @@ const meta = {
       description: 'Controlled open state; omit to let the trigger drive it',
       table: { category: 'State' },
     },
+    tone: {
+      control: 'select',
+      options: tones,
+      description:
+        'Brand tone (primary | secondary) for item hover/focus/press; destructive items use error',
+      table: { category: 'Appearance' },
+    },
     onClose: {
       control: false,
-      description: 'Fired by backdrop press, item selection, and Android back',
-      table: { category: 'Actions' },
+      description:
+        'Fired by backdrop press, item selection, and Android back (stories log dismissals only; item presses log onPress)',
+      table: { category: 'Events' },
     },
     position: {
       control: 'object',
@@ -73,23 +101,37 @@ type Story = StoryObj<typeof meta>;
 export const Playground: Story = {
   render: (args) => (
     <Frame>
-      <Menu {...args} />
+      <LoggedMenu {...args} />
     </Frame>
   ),
 };
 
 // Disabled rows dim; destructive rows take the error tone.
 export const ItemVariants: Story = {
-  render: () => (
+  args: {
+    items: [
+      {
+        label: 'Refresh',
+        icon: 'loop',
+        onPress: fn().mockName('Refresh onPress'),
+      },
+      {
+        label: 'Premium feature',
+        icon: 'lock',
+        disabled: true,
+        onPress: fn().mockName('Premium feature onPress'),
+      },
+      {
+        label: 'Delete account',
+        icon: 'close',
+        destructive: true,
+        onPress: fn().mockName('Delete account onPress'),
+      },
+    ],
+  },
+  render: (args) => (
     <Frame>
-      <Menu
-        trigger={burgerTrigger}
-        items={[
-          { label: 'Refresh', icon: 'loop' },
-          { label: 'Premium feature', icon: 'lock', disabled: true },
-          { label: 'Delete account', icon: 'close', destructive: true },
-        ]}
-      />
+      <LoggedMenu {...args} />
     </Frame>
   ),
 };
@@ -97,6 +139,7 @@ export const ItemVariants: Story = {
 // The Header flow: parent state drives open/onClose and pins the position.
 function ControlledDemo(args: MenuProps) {
   const [open, setOpen] = useState(false);
+  const logged = useSingleActionLog(args.items, args.onClose);
   return (
     <Frame>
       <Pressable
@@ -109,10 +152,11 @@ function ControlledDemo(args: MenuProps) {
       </Pressable>
       <Menu
         {...args}
+        items={logged.items ?? []}
         trigger={undefined}
         open={open}
         onClose={() => {
-          args.onClose?.();
+          logged.onClose();
           setOpen(false);
         }}
         position={{ top: 60, right: 16 }}

@@ -10,8 +10,10 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import type { NavigationTone } from '../../themes/paletteTones';
 import { IconButton } from '../IconButton';
 import { Logo } from '../Logo';
+import { NavItemRow, type NavItem } from '../NavItem';
 
 const IS_WEB = Platform.OS === 'web';
 
@@ -20,12 +22,21 @@ const Panel = (IS_WEB ? View : Animated.View) as typeof View;
 
 export type DrawerSide = 'left' | 'right';
 
+/** Brand tone for item hover and the close button; Drawer offers primary and secondary only. */
+export type DrawerTone = NavigationTone;
+
+export type DrawerItem = NavItem;
+
 export type DrawerViewProps = {
   open: boolean;
   /** Visual in/out state; drives the slide transition on web. */
   shown?: boolean;
-  /** Fired by backdrop press and Android back. */
+  /** Fired by backdrop press, close button, item selection, and Android back. */
   onClose: () => void;
+  /** Navigation rows rendered above children; selecting one closes the drawer. */
+  items?: DrawerItem[];
+  /** Theme tone for item hover/focus/press and the close button. */
+  tone?: DrawerTone;
   /** Screen edge the panel sits on; measured from the trigger when unset. */
   side?: DrawerSide;
   /** Panel width in px. */
@@ -41,7 +52,7 @@ export type DrawerProps = Omit<DrawerViewProps, 'open' | 'onClose'> & {
   trigger?: ReactNode;
   /** Controlled open state; omit to let the trigger drive it. */
   open?: boolean;
-  /** Notified when the drawer closes (backdrop, Android back). */
+  /** Notified when the drawer closes (backdrop, close button, item selection, Android back). */
   onClose?: () => void;
 };
 
@@ -54,6 +65,8 @@ export function DrawerView({
   side = 'left',
   width = 280,
   slideStyle,
+  items,
+  tone = 'primary',
   children,
   className,
 }: DrawerViewProps): ReactElement {
@@ -94,11 +107,18 @@ export function DrawerView({
             <IconButton
               name={side === 'left' ? 'chevron-left' : 'chevron-right'}
               size="md"
-              tone="primary"
+              tone={tone}
               accessibilityLabel="Close drawer"
               onPress={onClose}
             />
           </View>
+          {items?.length ? (
+            <View accessibilityRole="menu" className="py-2">
+              {items.map((item) => (
+                <NavItemRow key={item.label} item={item} tone={tone} size="md" onSelect={onClose} />
+              ))}
+            </View>
+          ) : null}
           {children}
         </Panel>
       </View>

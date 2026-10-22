@@ -1,8 +1,8 @@
 import { useState, type ReactElement } from 'react';
 import { Pressable, View } from 'react-native';
 
+import type { PaletteTone } from '../../themes/paletteTones';
 import { BodyText } from '../BodyText';
-import type { ButtonTone } from '../Button';
 import { Icon } from '../Icon';
 import type { IconName } from '../Icon';
 import type { TextTone } from '../../utils/text.styles';
@@ -32,8 +32,8 @@ export type FooterProps = {
   // Tabs variant
   /** Tabs for the bottom nav bar; renders an empty bar when unset. */
   tabs?: FooterTab[];
-  /** Active tab color, like Button tones. */
-  activeTone?: ButtonTone;
+  /** Active tab color from the theme palette tones. */
+  activeTone?: PaletteTone;
   /** Label of the active tab; omit to manage internally. */
   activeTab?: string;
   /** Initial active tab when uncontrolled. */

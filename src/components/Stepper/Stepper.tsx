@@ -1,11 +1,12 @@
 import { useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { Animated, Easing, LayoutAnimation, Platform, Pressable, Text, View, type PressableProps } from 'react-native';
+import type { PaletteTone } from '../../themes/paletteTones';
 import { a11yProps } from '../../utils/a11yProps';
 import { Icon } from '../Icon';
 
 // --- Types -----------------------------------------------------------------------
 
-export type StepperTone = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+export type StepperTone = PaletteTone;
 
 export type StepperStep = {
   title: string;

@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
+import { fn } from 'storybook/test';
 import { View } from 'react-native';
 import { Input, InputView } from '../Input';
 import { Icon } from '../../Icon';
+import { paletteTones } from '../../../themes/paletteTones';
 
-const tones = ['primary', 'secondary', 'error', 'warning', 'info', 'success'] as const;
+const tones = paletteTones;
 
 // Fixed-width frame so fields don't stretch across the canvas.
 const Frame = ({ children }: { children: ReactNode }) => (
@@ -28,6 +30,10 @@ const meta = {
     error: false,
     disabled: false,
     required: false,
+    onChangeText: fn(),
+    onFocus: fn(),
+    onBlur: fn(),
+    onSubmitEditing: fn(),
   },
   argTypes: {
     label: {
@@ -73,6 +79,24 @@ const meta = {
       control: 'boolean',
       description: 'Appends an asterisk to the label',
       table: { category: 'State' },
+    },
+    onChangeText: {
+      control: false,
+      description: 'Called when the field value changes',
+      table: { category: 'Events' },
+    },
+    onFocus: {
+      control: false,
+      table: { category: 'Events' },
+    },
+    onBlur: {
+      control: false,
+      table: { category: 'Events' },
+    },
+    onSubmitEditing: {
+      control: false,
+      description: 'Called when the user submits the field',
+      table: { category: 'Events' },
     },
     iconLeft: {
       control: 'boolean',
@@ -155,8 +179,8 @@ export const Tones: Story = {
 export const WithIcons: Story = {
   render: (args) => (
     <Frame>
-      <Input {...args} label="Search" placeholder="Search…" iconLeft={<Icon name="magnifier" />} />
-      <Input {...args} label="Select" placeholder="Choose…" iconRight={<Icon name="eye" />} />
+      <Input {...args} label="Search" iconLeft={<Icon name="magnifier" />} />
+      <Input {...args} label="Select" iconRight={<Icon name="eye" />} />
     </Frame>
   ),
 };
@@ -172,7 +196,7 @@ export const States: Story = {
         helperText="Please enter a valid email address"
       />
       <Input {...args} label="Disabled" disabled placeholder="Cannot edit" helperText="This field is disabled" />
-      <Input {...args} label="Required" required placeholder="Required field" helperText="Marked with an asterisk" />
+      <Input {...args} label="Required" required helperText="Marked with an asterisk" />
     </Frame>
   ),
 };

@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
+import { fn } from 'storybook/test';
 import { Text, View } from 'react-native';
 import { Button } from '../Button';
 import { Icon } from '../../Icon';
@@ -22,6 +23,8 @@ const meta = {
     variant: 'default',
     tone: 'primary',
     size: 'md',
+    onPress: fn(),
+    onLongPress: fn(),
   },
   argTypes: {
     label: {
@@ -43,6 +46,18 @@ const meta = {
       control: 'select',
       options: ['sm', 'md', 'lg'],
       table: { category: 'Appearance' },
+    },
+    disabled: {
+      control: 'boolean',
+      table: { category: 'State' },
+    },
+    onPress: {
+      control: false,
+      table: { category: 'Events' },
+    },
+    onLongPress: {
+      control: false,
+      table: { category: 'Events' },
     },
     iconLeft: {
       control: 'boolean',
@@ -89,7 +104,7 @@ export const Playground: Story = {
 };
 
 export const VariantMatrix: Story = {
-  render: () => (
+  render: ({ onPress, onLongPress }) => (
     <View className="gap-5">
       {tones.map((tone) => (
         <View key={tone} className="gap-2">
@@ -104,6 +119,8 @@ export const VariantMatrix: Story = {
                 tone={tone}
                 variant={variant}
                 size="sm"
+                onPress={onPress}
+                onLongPress={onLongPress}
               />
             ))}
           </View>
@@ -114,11 +131,13 @@ export const VariantMatrix: Story = {
 };
 
 export const WithIcons: Story = {
-  render: ({ iconLeft, iconRight, size, ...args }) => (
+  render: ({ iconLeft, iconRight, size, onPress, onLongPress, ...args }) => (
     <View className="gap-5">
       <Button
         {...args}
         size={size}
+        onPress={onPress}
+        onLongPress={onLongPress}
         iconLeft={demoIcon('chevron-left', iconLeft, size)}
         iconRight={demoIcon('chevron-right', iconRight, size)}
       />
@@ -135,6 +154,8 @@ export const WithIcons: Story = {
                 tone={tone}
                 variant={variant}
                 size="sm"
+                onPress={onPress}
+                onLongPress={onLongPress}
                 iconLeft={<Icon name="chevron-left" size="sm" />}
                 iconRight={<Icon name="chevron-right" size="sm" />}
               />
@@ -151,5 +172,11 @@ export const Accessibility: Story = {
     label: 'Save changes',
     accessibilityLabel: 'Save changes to your profile',
     accessibilityHint: 'Saves the current profile details',
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
   },
 };

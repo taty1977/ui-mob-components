@@ -45,6 +45,7 @@ const meta = {
     children: false,
     accessibilityLabel: 'Notifications',
     onPress: fn(),
+    onLongPress: fn(),
   },
   argTypes: {
     name: {
@@ -84,7 +85,11 @@ const meta = {
     },
     onPress: {
       control: false,
-      table: { category: 'Actions' },
+      table: { category: 'Events' },
+    },
+    onLongPress: {
+      control: false,
+      table: { category: 'Events' },
     },
     className: {
       control: 'text',

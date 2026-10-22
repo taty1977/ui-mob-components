@@ -6,6 +6,7 @@ import { Footer } from '../Footer';
 import type { FooterProps, FooterTab } from '../Footer';
 import { Drawer } from '../../Drawer';
 import { Icon, type IconName } from '../../Icon';
+import { paletteTones } from '../../../themes/paletteTones';
 
 // --- Fixtures --------------------------------------------------------------------
 
@@ -33,6 +34,9 @@ const drawerContent = (
     ))}
   </View>
 );
+
+// Named so the Actions panel logs it; spies outside args are otherwise unnamed and skipped.
+const onDrawerClose = fn().mockName('onDrawerClose');
 
 // --- Meta ------------------------------------------------------------------------
 
@@ -90,7 +94,7 @@ const meta = {
     },
     activeTone: {
       control: 'select',
-      options: ['primary', 'secondary', 'error', 'warning', 'info', 'success'],
+      options: paletteTones,
       description: 'Active tab color, like Button tones (variant="tabs")',
       table: { category: 'Appearance' },
     },
@@ -109,7 +113,7 @@ const meta = {
     onTabPress: {
       control: false,
       description: 'Called with the pressed tab label (variant="tabs")',
-      table: { category: 'Actions' },
+      table: { category: 'Events' },
     },
     bottomInset: {
       control: 'number',
@@ -137,7 +141,14 @@ function FooterWithDrawer(args: FooterProps) {
           if (label === 'Menu') setDrawerOpen(true);
         }}
       />
-      <Drawer open={drawerOpen} side="right" onClose={() => setDrawerOpen(false)}>
+      <Drawer
+        open={drawerOpen}
+        side="right"
+        onClose={() => {
+          onDrawerClose();
+          setDrawerOpen(false);
+        }}
+      >
         {drawerContent}
       </Drawer>
     </>

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
+import { fn } from 'storybook/test';
 import { View } from 'react-native';
 import { Screen } from '../Screen';
 import { BodyText } from '../../BodyText';
@@ -50,8 +51,20 @@ const meta = {
   component: Screen,
   args: {
     children: content,
-    header: { title: 'Today', unreadCount: 2 },
-    footer: { variant: 'tabs', tabs: APP_TABS, activeTab: 'Today' },
+    header: {
+      title: 'Today',
+      unreadCount: 2,
+      showLogo: false,
+      onPressProfile: fn(),
+      onPressSearch: fn(),
+      onPressNotification: fn(),
+    },
+    footer: {
+      variant: 'tabs',
+      tabs: APP_TABS,
+      defaultTab: 'Today',
+      onTabPress: fn(),
+    },
   },
   argTypes: {
     // Content

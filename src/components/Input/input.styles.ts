@@ -1,8 +1,10 @@
+import type { PaletteTone } from '../../themes/paletteTones';
+
 // --- Types ----------------------------------------------------------------------
 
 export type InputVariant = 'outlined' | 'filled' | 'standard';
 export type InputSize = 'small' | 'normal';
-export type InputTone = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+export type InputTone = PaletteTone;
 
 /** Border/label classes per tone. */
 export type ToneClasses = {
@@ -12,7 +14,7 @@ export type ToneClasses = {
   text: string;
 };
 
-export type InFieldLabelPlacement = 'notch' | 'filledTop' | 'unshrunk';
+export type InFieldLabelPlacement = 'notch' | 'filledTop' | 'standardTop' | 'unshrunk';
 
 // --- Frame & spacing --------------------------------------------------------------
 
@@ -35,17 +37,17 @@ export const fieldFrame: Record<InputVariant, Record<InputSize, string>> = {
 // An adornment takes 50% off the field padding on its own side.
 export const HORIZONTAL_PADDING: Record<InputSize, { plain: number; withIcon: number }> = {
   small: { plain: 16, withIcon: 8 },
-  normal: { plain: 24, withIcon: 12 },
+  normal: { plain: 16, withIcon: 12 },
 };
 
 export const paddingLeftClasses: Record<InputSize, { plain: string; withIcon: string }> = {
   small: { plain: 'pl-4', withIcon: 'pl-2' },
-  normal: { plain: 'pl-6', withIcon: 'pl-3' },
+  normal: { plain: 'pl-4', withIcon: 'pl-3' },
 };
 
 export const paddingRightClasses: Record<InputSize, { plain: string; withIcon: string }> = {
   small: { plain: 'pr-4', withIcon: 'pr-2' },
-  normal: { plain: 'pr-6', withIcon: 'pr-3' },
+  normal: { plain: 'pr-4', withIcon: 'pr-3' },
 };
 
 export const fieldGap: Record<InputSize, string> = {
@@ -145,11 +147,24 @@ export const toneClasses: Record<InputTone | 'disabled', ToneClasses> = {
 export const NOTCH_LABEL_LEFT = 12;
 
 /** Where the label sits once the field has a value, per variant. */
-export const shrunkPlacement = { outlined: 'notch', filled: 'filledTop', standard: 'above' } as const;
+export const shrunkPlacement = {
+  outlined: 'notch',
+  filled: 'filledTop',
+  standard: 'standardTop',
+} as const satisfies Record<InputVariant, InFieldLabelPlacement>;
 
 // Wrapper classes for the in-field label positions.
 export const inFieldLabelWrapper: Record<InFieldLabelPlacement, string> = {
   notch: 'absolute -top-2 left-3 z-10',
-  filledTop: 'absolute top-1',
+  filledTop: 'absolute left-4 right-4 top-1',
+  standardTop: 'absolute -top-2 left-0 z-10',
   unshrunk: 'absolute bottom-0 top-0 justify-center',
+};
+
+// Label text is always 13px; line heights match the web field (1.5 / 14px when filled-shrunk).
+export const inFieldLabelText: Record<InFieldLabelPlacement, string> = {
+  notch: 'px-1 text-13 leading-20',
+  filledTop: 'text-13 leading-14',
+  standardTop: 'pl-4 text-13 leading-20',
+  unshrunk: 'text-13 leading-20',
 };

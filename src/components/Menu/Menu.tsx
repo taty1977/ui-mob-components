@@ -1,19 +1,15 @@
 import { useRef, useState, type ReactElement, type ReactNode } from 'react';
-import { Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
+import { Modal, Pressable, useWindowDimensions, View } from 'react-native';
 
-import { Icon, type IconName } from '../Icon';
+import type { NavigationTone } from '../../themes/paletteTones';
+import { NavItemRow, type NavItem } from '../NavItem';
+
+/** Brand tone for item hover; Menu offers primary and secondary only. */
+export type MenuTone = NavigationTone;
 
 // --- Types -----------------------------------------------------------------------
 
-export type MenuItem = {
-  label: string;
-  /** Registry icon name shown before the label. */
-  icon?: IconName;
-  /** Error tone for destructive actions. */
-  destructive?: boolean;
-  disabled?: boolean;
-  onPress?: () => void;
-};
+export type MenuItem = NavItem;
 
 /** Window-px offset for the card; right-aligned when left is omitted. */
 export type MenuPosition = { top: number; right?: number; left?: number };
@@ -24,6 +20,8 @@ export type MenuViewProps = {
   /** Fired by backdrop press, item selection, and Android back. */
   onClose: () => void;
   position?: MenuPosition;
+  /** Theme tone (primary | secondary) for item hover, focus, and press; destructive items always use error. */
+  tone?: MenuTone;
   className?: string;
 };
 
@@ -45,6 +43,7 @@ export function MenuView({
   open,
   onClose,
   position,
+  tone = 'primary',
   className,
 }: MenuViewProps): ReactElement {
   return (
@@ -68,33 +67,7 @@ export function MenuView({
           }}
         >
           {items.map((item) => (
-            <Pressable
-              key={item.label}
-              accessibilityRole="menuitem"
-              disabled={item.disabled}
-              onPress={() => {
-                item.onPress?.();
-                onClose();
-              }}
-              className={[
-                'flex-row items-center gap-3 px-4 py-2.5 text-text-primary',
-                item.disabled ? 'opacity-40' : undefined,
-              ]
-                .filter(Boolean)
-                .join(' ')}
-            >
-              {item.icon ? (
-                <Icon name={item.icon} size="sm" tone={item.destructive ? 'error' : 'inherit'} />
-              ) : null}
-              <Text
-                className={[
-                  'text-15',
-                  item.destructive ? 'text-palette-error-main' : 'text-text-primary',
-                ].join(' ')}
-              >
-                {item.label}
-              </Text>
-            </Pressable>
+            <NavItemRow key={item.label} item={item} tone={tone} size="sm" onSelect={onClose} />
           ))}
         </View>
       </View>
@@ -121,7 +94,10 @@ export function Menu({
   const openMenu = () => {
     // Align the card's right edge with the trigger's, just below it.
     anchorRef.current?.measureInWindow((x, y, width, height) =>
-      setMeasured({ top: y + height + 4, right: Math.max(windowWidth - x - width, 8) })
+      setMeasured({
+        top: y + height + 4,
+        right: Math.max(windowWidth - x - width, 8),
+      }),
     );
     setInternalOpen(true);
   };

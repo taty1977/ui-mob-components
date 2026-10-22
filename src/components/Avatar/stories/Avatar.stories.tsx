@@ -45,7 +45,7 @@ const meta = {
     onPress: {
       control: false,
       description: 'When set, the avatar is a button labeled "<name>\'s profile"',
-      table: { category: 'Actions' },
+      table: { category: 'Events' },
     },
     accessibilityLabel: { control: 'text', table: { category: 'Accessibility' } },
     className: { control: 'text', table: { category: 'Advanced' } },
@@ -61,11 +61,17 @@ export const Playground: Story = {};
 
 // All five size tokens; the dot and initial scale with the avatar.
 export const Sizes: Story = {
-  render: () => (
+  render: ({ onPress }) => (
     <View className="flex-row items-end gap-4">
       {sizes.map((size) => (
         <View key={size} className="items-center gap-1">
-          <Avatar name="Ana Gomez" imageUrl={demoAvatarUrl} size={size} status="online" />
+          <Avatar
+            name="Ana Gomez"
+            imageUrl={demoAvatarUrl}
+            size={size}
+            status="online"
+            onPress={onPress}
+          />
           <Text className="text-12 text-text-secondary">{size}</Text>
         </View>
       ))}
@@ -75,14 +81,14 @@ export const Sizes: Story = {
 
 // Image vs initial fallback against each presence state (online / offline / none).
 export const States: Story = {
-  render: () => (
+  render: ({ onPress }) => (
     <View className="flex-row items-center gap-4">
-      <Avatar name="Ana Gomez" imageUrl={demoAvatarUrl} status="online" />
-      <Avatar name="Ana Gomez" status="online" />
-      <Avatar name="Ben Lee" imageUrl="https://i.pravatar.cc/96?img=12" status="offline" />
-      <Avatar name="Ben Lee" status="offline" />
-      <Avatar name="Cleo Diaz" imageUrl="https://i.pravatar.cc/96?img=32" />
-      <Avatar name="Cleo Diaz" />
+      <Avatar name="Ana Gomez" imageUrl={demoAvatarUrl} status="online" onPress={onPress} />
+      <Avatar name="Ana Gomez" status="online" onPress={onPress} />
+      <Avatar name="Ben Lee" imageUrl="https://i.pravatar.cc/96?img=12" status="offline" onPress={onPress} />
+      <Avatar name="Ben Lee" status="offline" onPress={onPress} />
+      <Avatar name="Cleo Diaz" imageUrl="https://i.pravatar.cc/96?img=32" onPress={onPress} />
+      <Avatar name="Cleo Diaz" onPress={onPress} />
     </View>
   ),
 };
